@@ -5,13 +5,19 @@ import (
 	"gokripto/routes"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
 	Database.Connect()
 
 	app := fiber.New()
-	routes.Setup(app)
-	app.Listen(":3000")
 
+	app.Use(cors.New(cors.Config{
+		AllowCredentials: true,
+	}))
+
+	routes.Setup(app)
+	app.Static("/", "./static") // Bu satır, statik dosyaların sunulacağı klasörü belirtir
+	app.Listen(":3000")
 }
