@@ -20,9 +20,8 @@ func main() {
 
 	routes.Setup(app)
 	app.Static("/", "./static") // Bu satır, statik dosyaların sunulacağı klasörü belirtir
-
-	// getExchangeRate'ı çalıştırmak için bir endpoint ekleyin
-	app.Get("/get-exchange-rate", controllers.CryptoData)
+	app.Get("/get-exchange-rate", controllers.AddCryptoData)
+	app.Get("/update-exchange-rate", controllers.UpdateCryptoData)
 
 	app.Listen(":3000")
 }
