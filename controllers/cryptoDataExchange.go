@@ -8,8 +8,9 @@ import (
 	"net/http"
 )
 
-func GetExchangeRate() (model.ExchangeData, error) {
-	url := "https://api.swapzone.io/v1/exchange/get-rate?from=btc&to=usdt&amount=1"
+func GetExchangeRate(cryptoName string) (model.ExchangeData, error) {
+
+	url := fmt.Sprintf("https://api.swapzone.io/v1/exchange/get-rate?from=%s&to=usdt&amount=1", cryptoName)
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

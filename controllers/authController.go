@@ -2,6 +2,7 @@ package controllers
 
 import (
 	model "gokripto/Model"
+	"math/rand"
 	"strconv"
 	"time"
 
@@ -22,13 +23,13 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
-
+	token := generateToken()
 	user := model.User{
-		Name:     data["name"],
-		Email:    data["email"],
-		Password: password,
+		Name:          data["name"],
+		Email:         data["email"],
+		Password:      password,
+		WalletAddress: token,
 	}
-
 	Database.GetDB().Create(&user)
 	return c.JSON(user)
 }
@@ -120,4 +121,15 @@ func Logout(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"message": "success",
 	})
+}
+
+func generateToken() string {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	chars := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+	length := r.Intn(10) + 26
+	result := make([]byte, length)
+	for i := 0; i < length; i++ {
+		result[i] = chars[r.Intn(len(chars))]
+	}
+	return string(result)
 }

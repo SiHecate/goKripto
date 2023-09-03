@@ -7,6 +7,6 @@ import (
 type Crypto struct {
 	ID        uint      `json:"cryptoID" gorm:"primaryKey"`
 	Name      string    `json:"cryptoname"`
-	Price     int       `json:"price"`
+	Price     float64   `json:"price"`
 	UpdatedAt time.Time `json:"-"`
 }
