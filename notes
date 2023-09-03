@@ -1,0 +1,44 @@
+api key zigQHUYGX.
+
+
+10 tane crypto para birimi çekicez
+10 tane crypto para birimini listeleyip bunların satın almak satmak ve satın alınan paraların miktarını listelemek 
+Database ilişkilerini hallet 
+Listelemede bir crypto para birimini dolar'e çevirieceğim 
+Satın almada ve satmada ise istediğim amount'da işlem yapacağım
+
+
+Kullanılacak cryptolar:
+
+BTC-ETH-LTC-XRP-DOGE-SOL-TRX-ADA-AWAX-USDC
+
+https://api.swapzone.io/v1/exchange/get-rate?from=btc&to=eur&amount=0.1&rateType=all&availableInUSA=false&chooseRate=best&noRefundAddress=false
+https://api.swapzone.io/v1/exchange/get-rate?from=btc&to=eur&amount=0.1&rateType=all&availableInUSA=false&chooseRate=best&noRefundAddress=false
+https://api.swapzone.io/v1/exchange/get-rate?from=btc&to=eur&amount=0.1&rateType=all&availableInUSA=false&chooseRate=best&noRefundAddress=false
+https://api.swapzone.io/v1/exchange/get-rate?from=btc&to=eur&amount=0.1&rateType=all&availableInUSA=false&chooseRate=best&noRefundAddress=false
+https://api.swapzone.io/v1/exchange/get-rate?from=btc&to=eur&amount=0.1&rateType=all&availableInUSA=false&chooseRate=best&noRefundAddress=false
+https://api.swapzone.io/v1/exchange/get-rate?from=btc&to=eur&amount=0.1&rateType=all&availableInUSA=false&chooseRate=best&noRefundAddress=false
+https://api.swapzone.io/v1/exchange/get-rate?from=btc&to=eur&amount=0.1&rateType=all&availableInUSA=false&chooseRate=best&noRefundAddress=false
+https://api.swapzone.io/v1/exchange/get-rate?from=btc&to=eur&amount=0.1&rateType=all&availableInUSA=false&chooseRate=best&noRefundAddress=false
+
+cryptolist = [BTC-ETH-LTC-XRP-DOGE-SOL-TRX-ADA-AWAX-USDC]
+for xxxxx in cryptolist
+    url = "https://api.swapzone.io/v1/exchange/get-rate?from=XXXX&to=USDT&amount=0.1&rateType=all&availableInUSA=false&chooseRate=best&noRefundAddress=false"
+
+
+
+import (
+	"math/rand"
+	"time"
+)
+
+func generateToken() string {
+	rand.Seed(time.Now().UnixNano())
+	chars := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+	length := rand.Intn(10) + 26
+	result := make([]byte, length)
+	for i := 0; i < length; i++ {
+		result[i] = chars[rand.Intn(len(chars))]
+	}
+	return string(result)
+}

@@ -22,5 +22,5 @@ func GetDB() *gorm.DB {
 
 func Connect() {
 	dbConnect()
-	dbUser()
+	migrateUser()
 }

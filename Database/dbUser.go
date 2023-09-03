@@ -2,6 +2,6 @@ package Database
 
 import model "gokripto/Model"
 
-func dbUser() {
+func migrateUser() {
 	GetDB().AutoMigrate(&model.User{})
 }
