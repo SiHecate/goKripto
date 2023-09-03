@@ -20,7 +20,14 @@ func GetDB() *gorm.DB {
 	return db
 }
 
+func MigrateTables() {
+	migrateUser()
+	migrateCrypto()
+	migrateTransaction()
+	migrateWallet()
+}
+
 func Connect() {
 	dbConnect()
-	migrateUser()
+	MigrateTables()
 }
