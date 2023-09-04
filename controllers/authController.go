@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	model "gokripto/Model"
 	"math/rand"
 	"strconv"
@@ -23,12 +24,13 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
-	token := generateToken()
+	// token := generateToken()
+	tokenn := generateWalletToken()
 	user := model.User{
 		Name:          data["name"],
 		Email:         data["email"],
 		Password:      password,
-		WalletAddress: token,
+		WalletAddress: tokenn,
 	}
 	Database.GetDB().Create(&user)
 	return c.JSON(user)
@@ -132,4 +134,10 @@ func generateToken() string {
 		result[i] = chars[r.Intn(len(chars))]
 	}
 	return string(result)
+}
+
+func generateWalletToken() string {
+	w := make([]byte, 16)
+	rand.Read(w)
+	return fmt.Sprintf("%s", w)
 }
