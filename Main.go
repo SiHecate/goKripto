@@ -22,6 +22,7 @@ func main() {
 	app.Static("/", "./static") // Bu satır, statik dosyaların sunulacağı klasörü belirtir
 	app.Get("/get-exchange-rate", controllers.AddCryptoData)
 	app.Get("/update-exchange-rate", controllers.UpdateCryptoData)
+	app.Get("/ShowAll", controllers.ListAllCryptos)
 
 	app.Listen(":3000")
 }
