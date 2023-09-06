@@ -39,10 +39,6 @@ func Register(c *fiber.Ctx) error {
 }
 
 func GetUserWalletAddress(walletAddress string) model.User {
-<<<<<<< HEAD
-=======
-	// Wallet oluştururken kullanılacak olan değişkenleri çektiğimiz SQL sorgusu
->>>>>>> origin/main
 	var user model.User
 	Database.GetDB().Where("wallet_address = ?", walletAddress).First(&user)
 	return user
@@ -140,16 +136,10 @@ func Logout(c *fiber.Ctx) error {
 	})
 }
 
-<<<<<<< HEAD
 func generateWalletToken() string {
 
 	const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%+@"
 
-=======
-const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%+@"
-
-func generateWalletToken() string {
->>>>>>> origin/main
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	length := r.Intn(10) + 26
 	result := make([]byte, length)
