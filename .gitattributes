@@ -1,0 +1,7 @@
+# .gitattributes
+
+# Her dosya için LF kullan
+* text eol=lf
+
+# Özel dosyaları belirli biçimde kullan
+*.exe binary
