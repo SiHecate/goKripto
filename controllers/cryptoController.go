@@ -82,7 +82,6 @@ func BuyCryptos(c *fiber.Ctx) error {
 
 	var userBalance float64
 	Database.GetDB().Model(&model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &userBalance)
-<<<<<<< HEAD
 	var cryptoPrice float64
 	Database.GetDB().Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice)
 	totalCost := cryptoPrice * amountToBuy
@@ -156,20 +155,5 @@ func TransactionCryptos(c *fiber.Ctx, UserID string, price float64, cryptoname s
 	Database.GetDB().Create(&Transaction)
 	return c.JSON(fiber.Map{
 		"message": "Transaction successful",
-=======
-
-	var cryptoPrice float64
-	Database.GetDB().Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice)
-
-	totalCost := cryptoPrice * amountToBuy
-
-	return c.JSON(fiber.Map{
-		"message":     "Başarıyla",
-		"totalCost":   totalCost,
-		"cryptoName":  cryptoName,
-		"amountToBuy": amountToBuy,
-		"iss":         issuer,
-		"userbalance": userBalance,
->>>>>>> origin/main
 	})
 }
