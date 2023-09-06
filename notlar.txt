@@ -1,0 +1,36 @@
+api key zigQHUYGX.
+
+
+Kullanılacak cryptolar:
+
+BTC-ETH-LTC-XRP-DOGE-SOL-TRX-ADA-AWAX-USDC
+
+https://api.swapzone.io/v1/exchange/get-rate?from=btc&to=usdt&amount=1
+https://api.swapzone.io/v1/exchange/get-rate?from=eth&to=usdt&amount=1
+https://api.swapzone.io/v1/exchange/get-rate?from=ltc&to=usdt&amount=1
+https://api.swapzone.io/v1/exchange/get-rate?from=xrp&to=usdt&amount=1
+https://api.swapzone.io/v1/exchange/get-rate?from=doge&to=usdt&amount=1
+https://api.swapzone.io/v1/exchange/get-rate?from=sol&to=usdt&amount=1
+https://api.swapzone.io/v1/exchange/get-rate?from=trx&to=usdt&amount=1
+https://api.swapzone.io/v1/exchange/get-rate?from=ada&to=usdt&amount=1
+https://api.swapzone.io/v1/exchange/get-rate?from=awax&to=usdt&amount=1
+https://api.swapzone.io/v1/exchange/get-rate?from=uscd&to=usdt&amount=1
+
+
+
+ //					PAZARTESİYE KADAR YAPILACAKLAR
+
+// Satın alınan ya da satılan kripto paranın id'sini ya da adını alınacak
+// Adı alınan kripto paranın kaç tane alındığını ya da satıldığı alınacak
+// Her kripto paranın kendisi için sadece bir tane kısmı olacak örn: BTC 45 , ETH 20 gibi
+// Envanterde olan eşyaların değerleri + elde bulunan nakit para = Total Balance olarak user ve wallet kısımlarına gönderilecek
+// Alım satım işleri bu envanter aracılığı ile yapılacak ve Sell Buy fonksiyonlarının içerisine balance kontrolü getirilecek
+// Alım satım işleri aynı şekilde envanterdeki eşyaların sayısı ya da değeri kadar yapılabilecek buna da bir kontrol getirilecek 
+// Envanter'in kendi id'si olmayacak EnvanterID gibi EnvanterID'si == Wallet Adrress olacak bu sayada hem wallet'tan hem de userdan ulaşılabilecek
+// Ek eklenti Sell Buy fonksiyonlarının içerisine alım satımdan önce kripto paraların liste fiyatları otomatik olarak güncellenecek bu sayede alım satımda doğru bir ticaret olmuş olacak
+// Sırasıyla yapılacaklar
+// 		CryptoWallet oluştur
+// 		Wallet'ın id'sini wallet adress yap
+// 		İstenilen değerleri Sell Buy fonksiyonu esnasında çektir 
+// 		Normalizasyon kurallarını iyi bir şekilde kullanmaya çalış
+// Docker üzerine çalış ve uygulamayı dockerize et.
