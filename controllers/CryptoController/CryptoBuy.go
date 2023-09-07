@@ -11,6 +11,7 @@ import (
 const SecretKey = "secret"
 
 func BuyCryptos(c *fiber.Ctx) error {
+	UpdateCryptoData(c)
 	cookie := c.Cookies("jwt")
 	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(SecretKey), nil
@@ -41,6 +42,15 @@ func BuyCryptos(c *fiber.Ctx) error {
 
 	totalCost := cryptoPrice * amountToBuy
 	totalBalance := userBalance - totalCost
+
+	if totalCost > userBalance {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"message": "Insufficient balance",
+			"balance": userBalance,
+		})
+	}
+
 	Database.GetDB().Model(&model.Wallet{}).Where("user_id = ?", issuer).Update("balance", totalBalance)
 
 	//Crypto Wallet

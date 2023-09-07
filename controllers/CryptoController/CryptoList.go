@@ -8,6 +8,7 @@ import (
 )
 
 func ListAllCryptos(c *fiber.Ctx) error {
+	UpdateCryptoData(c)
 	var cryptos []model.Crypto
 	Database.GetDB().Find(&cryptos)
 	return c.JSON(cryptos)

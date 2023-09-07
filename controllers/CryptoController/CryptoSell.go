@@ -9,6 +9,7 @@ import (
 )
 
 func SellCryptos(c *fiber.Ctx) error {
+	UpdateCryptoData(c)
 	cookie := c.Cookies("jwt")
 	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(SecretKey), nil
@@ -46,8 +47,15 @@ func SellCryptos(c *fiber.Ctx) error {
 
 	CryptoWallet(cryptoID, cryptoName, cryptoPrice, amountToSell, WalletAddress, "sell")
 
-	TransactionCryptos(c, issuer, cryptoPrice, cryptoName, amountToSell, "Sell")
+	var cryptocurrency float64
+	Database.GetDB().Model(&model.CryptoWallet{}).Where("wallet_address = ? AND crypto_name = ?", WalletAddress, cryptoName).Pluck("amount", &cryptocurrency)
+	if cryptocurrency < 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "invalid number",
+		})
+	}
 
+	TransactionCryptos(c, issuer, cryptoPrice, cryptoName, amountToSell, "Sell")
 	type SellCryptoResponse struct {
 		TotalProfit   float64 `json:"totalProfit"`
 		CryptoName    string  `json:"cryptoName"`
@@ -56,6 +64,7 @@ func SellCryptos(c *fiber.Ctx) error {
 		UserBalance   float64 `json:"userBalance"`
 		UserBalanceAB float64 `json:"userBalanceAB"`
 		CryptoID      uint    `json:"cryptoID"`
+		Currency      float64
 	}
 	response := SellCryptoResponse{
 		TotalProfit:   totalProfit,
@@ -64,6 +73,7 @@ func SellCryptos(c *fiber.Ctx) error {
 		Issuer:        issuer,
 		UserBalance:   userBalance,
 		UserBalanceAB: totalBalance,
+		Currency:      cryptocurrency,
 	}
 
 	return c.Status(200).JSON(response)
