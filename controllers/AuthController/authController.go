@@ -80,7 +80,7 @@ func Login(c *fiber.Ctx) error {
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Issuer:    strconv.Itoa(int(user.Id)),
-		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // 1 day
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // 1 gün
 
 	})
 

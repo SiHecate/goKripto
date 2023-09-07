@@ -25,6 +25,7 @@ func MigrateTables() {
 	migrateCrypto()
 	migrateTransaction()
 	migrateWallet()
+	migrateCryptoWallet()
 }
 
 func Connect() {
