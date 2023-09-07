@@ -5,16 +5,13 @@ import (
 	model "gokripto/Model"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt"
 )
 
 func SellCryptos(c *fiber.Ctx) error {
 	UpdateCryptoData(c)
-	cookie := c.Cookies("jwt")
-	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(SecretKey), nil
-	})
-	if err != nil || !token.Valid {
+
+	issuer, err := GetToken(c)
+	if err != nil {
 		c.Status(fiber.StatusUnauthorized)
 		return c.JSON(fiber.Map{
 			"message": "unauthenticated",
@@ -25,9 +22,6 @@ func SellCryptos(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
-
-	claims := token.Claims.(*jwt.StandardClaims)
-	issuer := claims.Issuer
 
 	cryptoName := data["cryptoName"].(string)
 	amountToSell := data["amountToSell"].(float64)

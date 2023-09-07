@@ -5,18 +5,15 @@ import (
 	model "gokripto/Model"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt"
 )
 
 const SecretKey = "secret"
 
 func BuyCryptos(c *fiber.Ctx) error {
 	UpdateCryptoData(c)
-	cookie := c.Cookies("jwt")
-	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(SecretKey), nil
-	})
-	if err != nil || !token.Valid {
+
+	issuer, err := GetToken(c)
+	if err != nil {
 		c.Status(fiber.StatusUnauthorized)
 		return c.JSON(fiber.Map{
 			"message": "unauthenticated",
@@ -27,9 +24,6 @@ func BuyCryptos(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
-
-	claims := token.Claims.(*jwt.StandardClaims)
-	issuer := claims.Issuer
 
 	cryptoName := data["cryptoName"].(string)
 	amountToBuy := data["amountToBuy"].(float64)
@@ -60,9 +54,7 @@ func BuyCryptos(c *fiber.Ctx) error {
 	Database.GetDB().Model(&model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress)
 
 	TransactionCryptos(c, issuer, cryptoPrice, cryptoName, amountToBuy, "Buy")
-
 	CryptoWallet(cryptoID, cryptoName, cryptoPrice, amountToBuy, WalletAddress, "buy")
-	//CryptoWallet(CryptoID int, CryptoName string, CryptoPrice float64, Amount float64, WalletAddress string) {
 
 	type BuyCryptoResponse struct {
 		TotalCost     float64 `json:"totalCost"`
