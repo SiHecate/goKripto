@@ -20,4 +20,5 @@ func Setup(app *fiber.App) {
 	app.Get("/api/cryptoUpdate", CryptoControllers.UpdateCryptoData)
 	app.Get("/api/cryptoList", CryptoControllers.ListAllCryptos)
 	app.Get("/api/listcryptowallet", CryptoControllers.ListCryptoWallet)
+	app.Post("/api/addBalance", CryptoControllers.AddBalanceCrypto)
 }

@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: my-postgres-kripto
+    environment:
+      POSTGRES_DB: kriptoDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 393406
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
+  go-app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: my-go-app
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+    command: go run Main.go -b 0.0.0.0
+
+volumes:
+  postgres-db:
