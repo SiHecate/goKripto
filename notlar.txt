@@ -18,3 +18,4 @@ https://api.swapzone.io/v1/exchange/get-rate?from=uscd&to=usdt&amount=1
 
 
 
+
