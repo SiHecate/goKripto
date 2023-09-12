@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:latest
-    container_name: my-postgres-kripto
+    container_name: Kripto-Postgres
     environment:
       POSTGRES_DB: kriptoDB
       POSTGRES_USER: postgres
@@ -17,7 +17,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-    container_name: my-go-app
+    container_name: Kripto-app
     depends_on:
       - postgres
     ports:

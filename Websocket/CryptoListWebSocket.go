@@ -22,6 +22,8 @@ func StartWebSocket(app *fiber.App) {
 		// Yenileme hızı
 		ticker := time.NewTicker(5 * time.Second)
 		defer ticker.Stop()
+
+		// Websocket
 		for range ticker.C {
 			CryptoController.UpdateWSCryptoData(ws)
 		}
