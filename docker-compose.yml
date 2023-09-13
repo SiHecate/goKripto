@@ -15,8 +15,8 @@ services:
 
   go-app:
     build:
-      context: ./
       dockerfile: Dockerfile
+      context: ./
     container_name: Kripto-app
     depends_on:
       - postgres
