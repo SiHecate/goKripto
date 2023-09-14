@@ -20,7 +20,6 @@ services:
     container_name: Kripto-app
     depends_on:
       - postgres
-      - postgres-test
     ports:
       - "3000:3000"
     command: air ./cmd/main.go -b 0.0.0.0
