@@ -11,11 +11,11 @@ func Setup(app *fiber.App) {
 
 	//Post
 
-	app.Post("/api/register", AuthController.Register) // test done
-	app.Post("/api/login", AuthController.Login)       //test done
-	app.Post("/api/logout", AuthController.Logout)     //test done
-	app.Post("/api/cryptoBuy", CryptoControllers.BuyCryptos)
-	app.Post("/api/cryptoSell", CryptoControllers.SellCryptos)
+	app.Post("/api/register", AuthController.Register)         // test done
+	app.Post("/api/login", AuthController.Login)               // test done
+	app.Post("/api/logout", AuthController.Logout)             // test done
+	app.Post("/api/cryptoBuy", CryptoControllers.BuyCryptos)   // test done
+	app.Post("/api/cryptoSell", CryptoControllers.SellCryptos) // test done
 	app.Post("/api/addBalance", CryptoControllers.AddBalanceCrypto)
 
 	//Get
