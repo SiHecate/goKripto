@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 393406
     ports:
-      - "5432:5432"
+      - "5435:5432"
     volumes:
       - postgres-db:/var/lib/postgresql/data
 
@@ -20,10 +20,13 @@ services:
     container_name: Kripto-app
     depends_on:
       - postgres
+      - postgres-test
     ports:
       - "3000:3000"
     command: air ./cmd/main.go -b 0.0.0.0
     volumes:
       - ./:/app
+
 volumes:
   postgres-db:
+  postgres-test-db:

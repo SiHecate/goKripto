@@ -33,6 +33,13 @@ require (
 )
 
 require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
+
+require (
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/bep/godartsass v0.16.0 // indirect
 	github.com/bep/golibsass v1.1.0 // indirect
@@ -47,6 +54,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
 	github.com/spf13/afero v1.9.3 // indirect
+	github.com/stretchr/testify v1.8.4
 	github.com/tdewolff/parse/v2 v2.6.5 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 )
