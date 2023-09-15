@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"io"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func TestRegister(t *testing.T) {
-
+func TestAddBalance(t *testing.T) {
 	type wanted struct {
 		StatusCode   int
 		expectedKeys []string
@@ -19,31 +19,28 @@ func TestRegister(t *testing.T) {
 
 	app := fiber.New()
 
-	app.Post("/register", func(c *fiber.Ctx) error {
+	app.Post("/addBalance", func(c *fiber.Ctx) error {
 		var data map[string]string
-
 		if err := c.BodyParser(&data); err != nil {
+			return err
+		}
+
+		additiveBalanceStr := data["addBalance"]
+		if additiveBalanceStr == "" {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Invalid request data",
+				"amountError": "Amount does not exist",
 			})
 		}
-		if _, ok := data["password"]; !ok {
+
+		additiveBalance, err := strconv.ParseFloat(additiveBalanceStr, 64)
+		if err != nil || additiveBalance <= 0 {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"errorPassword": "Missing 'password' field",
+				"amountTypeError": "Invalid type of amount",
 			})
 		}
-		if _, ok := data["name"]; !ok {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"errorName": "Missing 'name' field",
-			})
-		}
-		if _, ok := data["email"]; !ok {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"errorEmail": "Missing 'email' field",
-			})
-		}
+
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"message": "Registration successful",
+			"message": "Adding balance successful",
 		})
 	})
 
@@ -54,7 +51,7 @@ func TestRegister(t *testing.T) {
 	}{
 		{
 			name:           "Valid Registration",
-			requestPayload: `{"name": "user123", "email": "user123@user.com", "password": "user123"}`,
+			requestPayload: `{"addBalance": "1000000"}`,
 			expected: wanted{
 				StatusCode: 200,
 				expectedKeys: []string{
@@ -63,42 +60,22 @@ func TestRegister(t *testing.T) {
 			},
 		},
 		{
-			name:           "Unvalid Registration",
-			requestPayload: `{""}`,
+			name:           "Unvalid Registration (Amount Error)",
+			requestPayload: `{"addBalance": ""}`,
 			expected: wanted{
 				StatusCode: 400,
 				expectedKeys: []string{
-					"error",
+					"amountError",
 				},
 			},
 		},
 		{
-			name:           "Invalid Registration (Missing Password)",
-			requestPayload: `{"name": "user123", "email": "user123@user.com"}`,
+			name:           "Unvalid Registration (Amount Type Error)",
+			requestPayload: `{"addBalance": "asd123"}`,
 			expected: wanted{
 				StatusCode: 400,
 				expectedKeys: []string{
-					"errorPassword",
-				},
-			},
-		},
-		{
-			name:           "Invalid Registration (Missing Username)",
-			requestPayload: `{"email": "user123@user.com", "password": "user123"}`,
-			expected: wanted{
-				StatusCode: 400,
-				expectedKeys: []string{
-					"errorName",
-				},
-			},
-		},
-		{
-			name:           "Invalid Registration (Missing Email)",
-			requestPayload: `{"name": "user123", "password": "user123"}`,
-			expected: wanted{
-				StatusCode: 400,
-				expectedKeys: []string{
-					"errorEmail",
+					"amountTypeError",
 				},
 			},
 		},
@@ -106,7 +83,7 @@ func TestRegister(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			req := httptest.NewRequest("POST", "/register", strings.NewReader(test.requestPayload))
+			req := httptest.NewRequest("POST", "/addBalance", strings.NewReader(test.requestPayload))
 			req.Header.Set("Content-Type", "application/json")
 
 			resp, err := app.Test(req)
@@ -138,8 +115,7 @@ func TestRegister(t *testing.T) {
 	}
 }
 
-func BenchmarkRegister(b *testing.B) {
-
+func BenchmarkAddBalance(b *testing.B) {
 	type wanted struct {
 		StatusCode   int
 		expectedKeys []string
@@ -147,31 +123,28 @@ func BenchmarkRegister(b *testing.B) {
 
 	app := fiber.New()
 
-	app.Post("/register", func(c *fiber.Ctx) error {
+	app.Post("/addBalance", func(c *fiber.Ctx) error {
 		var data map[string]string
-
 		if err := c.BodyParser(&data); err != nil {
+			return err
+		}
+
+		additiveBalanceStr := data["addBalance"]
+		if additiveBalanceStr == "" {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Invalid request data",
+				"amountError": "Amount does not exist",
 			})
 		}
-		if _, ok := data["password"]; !ok {
+
+		additiveBalance, err := strconv.ParseFloat(additiveBalanceStr, 64)
+		if err != nil || additiveBalance <= 0 {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"errorPassword": "Missing 'password' field",
+				"amountTypeError": "Invalid type of amount",
 			})
 		}
-		if _, ok := data["name"]; !ok {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"errorName": "Missing 'name' field",
-			})
-		}
-		if _, ok := data["email"]; !ok {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"errorEmail": "Missing 'email' field",
-			})
-		}
+
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"message": "Registration successful",
+			"message": "Adding balance successful",
 		})
 	})
 
@@ -182,7 +155,7 @@ func BenchmarkRegister(b *testing.B) {
 	}{
 		{
 			name:           "Valid Registration",
-			requestPayload: `{"name": "user123", "email": "user123@user.com", "password": "user123"}`,
+			requestPayload: `{"addBalance": "1000000"}`,
 			expected: wanted{
 				StatusCode: 200,
 				expectedKeys: []string{
@@ -191,42 +164,22 @@ func BenchmarkRegister(b *testing.B) {
 			},
 		},
 		{
-			name:           "Unvalid Registration",
-			requestPayload: `{""}`,
+			name:           "Unvalid Registration (Amount Error)",
+			requestPayload: `{"addBalance": ""}`,
 			expected: wanted{
 				StatusCode: 400,
 				expectedKeys: []string{
-					"error",
+					"amountError",
 				},
 			},
 		},
 		{
-			name:           "Invalid Registration (Missing Password)",
-			requestPayload: `{"name": "user123", "email": "user123@user.com"}`,
+			name:           "Unvalid Registration (Amount Type Error)",
+			requestPayload: `{"addBalance": "asd123"}`,
 			expected: wanted{
 				StatusCode: 400,
 				expectedKeys: []string{
-					"errorPassword",
-				},
-			},
-		},
-		{
-			name:           "Invalid Registration (Missing Username)",
-			requestPayload: `{"email": "user123@user.com", "password": "user123"}`,
-			expected: wanted{
-				StatusCode: 400,
-				expectedKeys: []string{
-					"errorName",
-				},
-			},
-		},
-		{
-			name:           "Invalid Registration (Missing Email)",
-			requestPayload: `{"name": "user123", "password": "user123"}`,
-			expected: wanted{
-				StatusCode: 400,
-				expectedKeys: []string{
-					"errorEmail",
+					"amountTypeError",
 				},
 			},
 		},
@@ -234,7 +187,7 @@ func BenchmarkRegister(b *testing.B) {
 
 	for _, test := range tests {
 		b.Run(test.name, func(b *testing.B) {
-			req := httptest.NewRequest("POST", "/register", strings.NewReader(test.requestPayload))
+			req := httptest.NewRequest("POST", "/addBalance", strings.NewReader(test.requestPayload))
 			req.Header.Set("Content-Type", "application/json")
 
 			resp, err := app.Test(req)
