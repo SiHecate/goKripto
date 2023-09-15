@@ -47,7 +47,7 @@ func TestLogout(t *testing.T) {
 		expected       wanted
 	}{
 		{
-			name:           "Valid Registration",
+			name:           "Valid Registration (Logout)",
 			requestPayload: `{"Name": "jwt", "Value": ""}`,
 			expected: wanted{
 				StatusCode: 200,
@@ -149,7 +149,7 @@ func BenchmarkLogout(b *testing.B) {
 		expected       wanted
 	}{
 		{
-			name:           "Valid Registration",
+			name:           "Valid Registration (Logout)",
 			requestPayload: `{"Name": "jwt", "Value": ""}`,
 			expected: wanted{
 				StatusCode: 200,

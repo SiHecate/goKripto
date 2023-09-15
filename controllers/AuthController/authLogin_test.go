@@ -47,7 +47,7 @@ func TestLogin(t *testing.T) {
 		expected       wanted
 	}{
 		{
-			name:           "Valid Registration",
+			name:           "Valid Registration (Login)",
 			requestPayload: `{"email": "user123@user.com", "password": "user123"}`,
 			expected: wanted{
 				StatusCode: 200,
@@ -77,7 +77,7 @@ func TestLogin(t *testing.T) {
 			},
 		},
 		{
-			name:           "Invalid Registration",
+			name:           "Invalid Registration (Login)",
 			requestPayload: `{"",}`,
 			expected: wanted{
 				StatusCode: 400,
@@ -159,7 +159,7 @@ func BenchmarkLogin(b *testing.B) {
 		expected       wanted
 	}{
 		{
-			name:           "Valid Registration",
+			name:           "Valid Registration (Login)",
 			requestPayload: `{"email": "user123@user.com", "password": "user123"}`,
 			expected: wanted{
 				StatusCode: 200,
@@ -189,7 +189,7 @@ func BenchmarkLogin(b *testing.B) {
 			},
 		},
 		{
-			name:           "Invalid Registration",
+			name:           "Invalid Registration (Login)",
 			requestPayload: `{"",}`,
 			expected: wanted{
 				StatusCode: 400,

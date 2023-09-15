@@ -53,7 +53,7 @@ func TestRegister(t *testing.T) {
 		expected       wanted
 	}{
 		{
-			name:           "Valid Registration",
+			name:           "Valid Registration (Register)",
 			requestPayload: `{"name": "user123", "email": "user123@user.com", "password": "user123"}`,
 			expected: wanted{
 				StatusCode: 200,
@@ -63,7 +63,7 @@ func TestRegister(t *testing.T) {
 			},
 		},
 		{
-			name:           "Unvalid Registration",
+			name:           "Unvalid Registration (Register)",
 			requestPayload: `{""}`,
 			expected: wanted{
 				StatusCode: 400,
@@ -181,7 +181,7 @@ func BenchmarkRegister(b *testing.B) {
 		expected       wanted
 	}{
 		{
-			name:           "Valid Registration",
+			name:           "Valid Registration (Register)",
 			requestPayload: `{"name": "user123", "email": "user123@user.com", "password": "user123"}`,
 			expected: wanted{
 				StatusCode: 200,
@@ -191,7 +191,7 @@ func BenchmarkRegister(b *testing.B) {
 			},
 		},
 		{
-			name:           "Unvalid Registration",
+			name:           "Unvalid Registration (Register)",
 			requestPayload: `{""}`,
 			expected: wanted{
 				StatusCode: 400,
