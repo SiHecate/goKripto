@@ -217,9 +217,9 @@ func BenchmarkSellCrypto(b *testing.B) {
 		},
 	}
 
-	for _, test := range tests {
-		b.Run(test.name, func(b *testing.B) {
-			req := httptest.NewRequest("POST", "/cryptoSell", strings.NewReader(test.requestPayload))
+	for _, benchmark := range tests {
+		b.Run(benchmark.name, func(b *testing.B) {
+			req := httptest.NewRequest("POST", "/cryptoSell", strings.NewReader(benchmark.requestPayload))
 			req.Header.Set("Content-Type", "application/json")
 
 			resp, err := app.Test(req)
@@ -228,8 +228,8 @@ func BenchmarkSellCrypto(b *testing.B) {
 			}
 			defer resp.Body.Close()
 
-			if resp.StatusCode != test.expected.StatusCode {
-				b.Errorf("Expected status code %d, but got %d", test.expected.StatusCode, resp.StatusCode)
+			if resp.StatusCode != benchmark.expected.StatusCode {
+				b.Errorf("Expected status code %d, but got %d", benchmark.expected.StatusCode, resp.StatusCode)
 			}
 
 			body, err := io.ReadAll(resp.Body)
@@ -242,7 +242,7 @@ func BenchmarkSellCrypto(b *testing.B) {
 				b.Fatal(err)
 			}
 
-			for _, key := range test.expected.expectedKeys {
+			for _, key := range benchmark.expected.expectedKeys {
 				if _, ok := response[key]; !ok {
 					b.Errorf("Expected JSON key '%s' not found in the response", key)
 				}
