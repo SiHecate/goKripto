@@ -56,7 +56,7 @@ func TestSellCrypto(t *testing.T) {
 		expected       wanted
 	}{
 		{
-			name:           "Valid Registration",
+			name:           "Valid Registration (Sell Crypto)",
 			requestPayload: `{"cryptoName": "btc", "amountToSell": "123"}`,
 			expected: wanted{
 				StatusCode: 200,
@@ -176,7 +176,7 @@ func BenchmarkSellCrypto(b *testing.B) {
 		expected       wanted
 	}{
 		{
-			name:           "Valid Registration",
+			name:           "Valid Registration (Sell Crypto)",
 			requestPayload: `{"cryptoName": "btc", "amountToSell": "123"}`,
 			expected: wanted{
 				StatusCode: 200,

@@ -50,7 +50,7 @@ func TestAddBalance(t *testing.T) {
 		expected       wanted
 	}{
 		{
-			name:           "Valid Registration",
+			name:           "Valid Registration (Add Balance)",
 			requestPayload: `{"addBalance": "1000000"}`,
 			expected: wanted{
 				StatusCode: 200,
@@ -154,7 +154,7 @@ func BenchmarkAddBalance(b *testing.B) {
 		expected       wanted
 	}{
 		{
-			name:           "Valid Registration",
+			name:           "Valid Registration (Add Balance)",
 			requestPayload: `{"addBalance": "1000000"}`,
 			expected: wanted{
 				StatusCode: 200,

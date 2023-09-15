@@ -56,7 +56,7 @@ func TestBuyCrypto(t *testing.T) {
 		expected       wanted
 	}{
 		{
-			name:           "Valid Registration",
+			name:           "Valid Registration Buy Crypto",
 			requestPayload: `{"cryptoName": "btc", "amountToBuy": "123"}`,
 			expected: wanted{
 				StatusCode: 200,
@@ -176,7 +176,7 @@ func BenchmarkBuyCrypto(b *testing.B) {
 		expected       wanted
 	}{
 		{
-			name:           "Valid Registration",
+			name:           "Valid Registration Buy Crypto",
 			requestPayload: `{"cryptoName": "btc", "amountToBuy": "123"}`,
 			expected: wanted{
 				StatusCode: 200,
