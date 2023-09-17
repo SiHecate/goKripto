@@ -10,7 +10,7 @@ import (
 const SecretKey = "secret"
 
 func BuyCryptos(c *fiber.Ctx) error {
-	UpdateCryptoData(c)
+	// UpdateCryptoData(c)
 
 	issuer, err := GetToken(c)
 	if err != nil {

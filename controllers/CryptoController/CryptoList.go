@@ -8,14 +8,14 @@ import (
 )
 
 func ListAllCryptos(c *fiber.Ctx) error {
-	UpdateCryptoData(c)
+	// UpdateCryptoData(c)
 	var cryptos []model.Crypto
 	Database.GetDB().Find(&cryptos)
 	return c.JSON(cryptos)
 }
 
 func ListCryptoWallet(c *fiber.Ctx) error {
-	UpdateCryptoData(c)
+	// UpdateCryptoData(c)
 	issuer, err := GetToken(c)
 	if err != nil {
 		c.Status(fiber.StatusUnauthorized)

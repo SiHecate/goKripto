@@ -17,5 +17,8 @@ https://api.swapzone.io/v1/exchange/get-rate?from=awax&to=usdt&amount=1
 https://api.swapzone.io/v1/exchange/get-rate?from=uscd&to=usdt&amount=1
 
 
-
+9/17/2023 Pazar
+* Ortalama zaman belirle
+* Route'lara erişimi bu süreye göre ayarla
+that's it teşekkürler thank you
 
