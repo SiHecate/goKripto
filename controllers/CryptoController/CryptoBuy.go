@@ -22,11 +22,27 @@ func BuyCryptos(c *fiber.Ctx) error {
 
 	var data map[string]interface{}
 	if err := c.BodyParser(&data); err != nil {
-		return err
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"message": "Invalid request data",
+		})
 	}
 
-	cryptoName := data["cryptoName"].(string)
-	amountToBuy := data["amountToBuy"].(float64)
+	cryptoName, ok := data["cryptoName"].(string)
+	if !ok {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"message": "Invalid cryptoName field",
+		})
+	}
+
+	amountToBuy, ok := data["amountToBuy"].(float64)
+	if !ok {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"message": "Invalid amountToBuy field",
+		})
+	}
 
 	var cryptoPrice float64
 	Database.GetDB().Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice)
@@ -38,6 +54,7 @@ func BuyCryptos(c *fiber.Ctx) error {
 	totalBalance := userBalance - totalCost
 
 	if totalCost > userBalance {
+		// Hata kontrolü: Yetersiz bakiye durumu
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
 			"message": "Insufficient balance",
@@ -76,5 +93,4 @@ func BuyCryptos(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(response)
-
 }

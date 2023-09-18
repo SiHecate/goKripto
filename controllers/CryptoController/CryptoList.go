@@ -25,10 +25,14 @@ func ListCryptoWallet(c *fiber.Ctx) error {
 	}
 
 	var WalletAddress string
-	Database.GetDB().Model(&model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress)
+	if err := Database.GetDB().Model(&model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress).Error; err != nil {
+		return err
+	}
 
 	var cryptoWallets []model.CryptoWallet
-	Database.GetDB().Model(&model.CryptoWallet{}).Where("wallet_address = ? AND amount > ? ", WalletAddress, 0).Find(&cryptoWallets)
+	if err := Database.GetDB().Model(&model.CryptoWallet{}).Where("wallet_address = ? AND amount > ? ", WalletAddress, 0).Find(&cryptoWallets).Error; err != nil {
+		return err
+	}
 
 	return c.JSON(cryptoWallets)
 }

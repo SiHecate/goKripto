@@ -20,22 +20,40 @@ func SellCryptos(c *fiber.Ctx) error {
 
 	var data map[string]interface{}
 	if err := c.BodyParser(&data); err != nil {
-		return err
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"message": "Invalid request data",
+		})
 	}
 
-	cryptoName := data["cryptoName"].(string)
-	amountToSell := data["amountToSell"].(float64)
+	cryptoName, ok := data["cryptoName"].(string)
+	if !ok {
+		c.Status(fiber.StatusBadRequest)
+		return c.JSON(fiber.Map{
+			"message": "Invalid cryptoName field",
+		})
+	}
+	amountToSell, ok := data["amountToSell"].(float64)
+	if !ok {
+		c.Status(fiber.StatusBadGateway)
+		return c.JSON(fiber.Map{
+			"message": "Invlaid cryptoAmount",
+		})
+	}
 
 	var userBalance float64
 	Database.GetDB().Model(&model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &userBalance)
+
 	var cryptoPrice float64
 	Database.GetDB().Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice)
+
 	totalProfit := cryptoPrice * amountToSell
 	totalBalance := userBalance + totalProfit
 	Database.GetDB().Model(&model.Wallet{}).Where("user_id = ?", issuer).Update("balance", totalBalance)
 
 	var cryptoID int
 	Database.GetDB().Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("id", &cryptoID)
+
 	var WalletAddress string
 	Database.GetDB().Model(&model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress)
 

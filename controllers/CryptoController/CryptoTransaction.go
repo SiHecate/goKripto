@@ -16,7 +16,10 @@ func TransactionCryptos(c *fiber.Ctx, UserID string, price float64, cryptoname s
 		Type:       transactionType,
 	}
 
-	Database.GetDB().Create(&Transaction)
+	if err := Database.GetDB().Create(&Transaction).Error; err != nil {
+		return err
+	}
+
 	return c.JSON(fiber.Map{
 		"message": "Transaction successful",
 	})
