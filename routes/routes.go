@@ -11,7 +11,7 @@ import (
 
 func Setup(app *fiber.App) {
 
-	timeoutDuration := 650 * time.Millisecond
+	timeoutDuration := 2000 * time.Millisecond
 
 	timeoutHandler := func(c *fiber.Ctx) error {
 		ch := make(chan struct{})
