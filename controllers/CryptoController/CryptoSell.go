@@ -66,8 +66,6 @@ func SellCryptos(c *fiber.Ctx) error {
 		return err
 	}
 
-	CryptoWallet(cryptoID, cryptoName, cryptoPrice, amountToSell, WalletAddress, "sell")
-
 	var cryptocurrency float64
 	Database.DB.Model(&model.CryptoWallet{}).Where("wallet_address = ? AND crypto_name = ?", WalletAddress, cryptoName).Pluck("amount", &cryptocurrency)
 	if cryptocurrency < 0 {
@@ -76,7 +74,10 @@ func SellCryptos(c *fiber.Ctx) error {
 		})
 	}
 
+	TransactionBalance(c, issuer, totalProfit, "Sales", "Crypto Sales")
 	TransactionCryptos(c, issuer, cryptoPrice, cryptoName, amountToSell, "Sell")
+	CryptoWallet(cryptoID, cryptoName, cryptoPrice, amountToSell, WalletAddress, "sell")
+
 	type SellCryptoResponse struct {
 		TotalProfit      float64 `json:"totalProfit"`
 		CryptoName       string  `json:"cryptoName"`

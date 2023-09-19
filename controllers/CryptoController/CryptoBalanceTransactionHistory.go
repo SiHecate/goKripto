@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func TransactionListCrypto(c *fiber.Ctx) error {
+func TransactionListBalance(c *fiber.Ctx) error {
 	issuer, err := GetToken(c)
 	if err != nil {
 		c.Status(fiber.StatusUnauthorized)
@@ -16,9 +16,9 @@ func TransactionListCrypto(c *fiber.Ctx) error {
 		})
 	}
 
-	var TransactionCryptos []model.TransactionCrypto
-	if err := Database.DB.Where("user_id = ?", issuer).Find(&TransactionCryptos).Error; err != nil {
+	var TransactionBalance []model.TransactionBalance
+	if err := Database.DB.Where("user_id = ?", issuer).Find(&TransactionBalance).Error; err != nil {
 		return err
 	}
-	return c.JSON(TransactionCryptos)
+	return c.JSON(TransactionBalance)
 }

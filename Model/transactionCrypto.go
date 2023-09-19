@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type Transaction struct {
+type TransactionCrypto struct {
 	ID         uint      `json:"transactionID" gorm:"unique"`
 	UserID     string    `json:"userID"`
 	CryptoName string    `json:"cryptoname"`

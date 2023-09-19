@@ -9,7 +9,7 @@ import (
 )
 
 func TransactionCryptos(c *fiber.Ctx, UserID string, price float64, cryptoname string, amount float64, transactionType string) error {
-	Transaction := model.Transaction{
+	TransactionCryptos := model.TransactionCrypto{
 		UserID:     UserID,
 		Price:      float64(price),
 		CryptoName: cryptoname,
@@ -18,7 +18,7 @@ func TransactionCryptos(c *fiber.Ctx, UserID string, price float64, cryptoname s
 		Date:       time.Now(),
 	}
 
-	if err := Database.DB.Create(&Transaction).Error; err != nil {
+	if err := Database.DB.Create(&TransactionCryptos).Error; err != nil {
 		return err
 	}
 

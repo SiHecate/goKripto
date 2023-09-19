@@ -30,6 +30,7 @@ func AddBalanceCrypto(c *fiber.Ctx) error {
 		return err
 	}
 
+	TransactionBalance(c, issuer, addBalance, "Deposit", "Balance Adding")
 	type addBalanceResponse struct {
 		Issuer           string  `json:"issuer"`
 		AvailableBalance float64 `json:"availableBalance"`

@@ -20,7 +20,8 @@ func dbConnect() {
 func MigrateTables() {
 	migrateUser()
 	migrateCrypto()
-	migrateTransaction()
+	migrateTransactionCrypto()
+	migrateTransactionBalance()
 	migrateWallet()
 	migrateCryptoWallet()
 }

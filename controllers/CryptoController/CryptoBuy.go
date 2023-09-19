@@ -80,6 +80,7 @@ func BuyCryptos(c *fiber.Ctx) error {
 		return err
 	}
 
+	TransactionBalance(c, issuer, totalCost, "Purchase", "Crypto Purchase")
 	TransactionCryptos(c, issuer, cryptoPrice, cryptoName, amountToBuy, "Buy")
 	CryptoWallet(cryptoID, cryptoName, cryptoPrice, amountToBuy, WalletAddress, "buy")
 

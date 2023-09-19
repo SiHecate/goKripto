@@ -49,11 +49,12 @@ func Setup(app *fiber.App) {
 	app.Post("/api/addBalance", timeoutHandler, CryptoControllers.AddBalanceCrypto) // Done
 
 	// Get
-	app.Get("/api/transactionHistory", timeoutHandler, CryptoControllers.TransactionList) // Done
-	app.Get("/api/user", timeoutHandler, AuthController.User)                             // Done
-	app.Get("/api/balance", timeoutHandler, CryptoControllers.AccountBalance)             // Done
-	app.Get("/api/cryptoAdd", CryptoControllers.AddCryptoData)                            // ?
-	app.Get("/api/cryptoUpdate", CryptoControllers.UpdateCryptoData)                      // Done
-	app.Get("/api/cryptoList", timeoutHandler, CryptoControllers.ListAllCryptos)          // Done
-	app.Get("/api/listcryptowallet", timeoutHandler, CryptoControllers.ListCryptoWallet)  // Done
+	app.Get("/api/CryptoTransactionHistory", timeoutHandler, CryptoControllers.TransactionListCrypto)   // Done
+	app.Get("/api/BalanceTransactionHistory", timeoutHandler, CryptoControllers.TransactionListBalance) // Done
+	app.Get("/api/user", timeoutHandler, AuthController.User)                                           // Done
+	app.Get("/api/balance", timeoutHandler, CryptoControllers.AccountBalance)                           // Done
+	app.Get("/api/cryptoAdd", CryptoControllers.AddCryptoData)                                          // ?
+	app.Get("/api/cryptoUpdate", CryptoControllers.UpdateCryptoData)                                    // Done
+	app.Get("/api/cryptoList", timeoutHandler, CryptoControllers.ListAllCryptos)                        // Done
+	app.Get("/api/listcryptowallet", timeoutHandler, CryptoControllers.ListCryptoWallet)                // Done
 }
