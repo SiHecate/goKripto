@@ -49,6 +49,7 @@ func Setup(app *fiber.App) {
 	app.Post("/api/addBalance", timeoutHandler, CryptoControllers.AddBalanceCrypto)
 
 	// Get
+	app.Get("/api/transactionHistory", timeoutHandler, CryptoControllers.TransactionList)
 	app.Get("/api/user", timeoutHandler, AuthController.User)
 	app.Get("/api/balance", timeoutHandler, CryptoControllers.AccountBalance)
 	app.Get("/api/cryptoAdd", CryptoControllers.AddCryptoData)
