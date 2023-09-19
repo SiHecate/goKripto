@@ -25,7 +25,7 @@ func Register(c *fiber.Ctx) error {
 		Password:      password,
 		WalletAddress: walletToken,
 	}
-	Database.GetDB().Create(&user)
+	Database.DB.Create(&user)
 
 	createdUser := GetUserWalletAddress(walletToken)
 	CreateWallet(createdUser)
@@ -35,7 +35,7 @@ func Register(c *fiber.Ctx) error {
 
 func GetUserWalletAddress(walletAddress string) model.User {
 	var user model.User
-	Database.GetDB().Where("wallet_address = ?", walletAddress).First(&user)
+	Database.DB.Where("wallet_address = ?", walletAddress).First(&user)
 	return user
 }
 
@@ -45,7 +45,7 @@ func CreateWallet(user model.User) error {
 		UserID:        user.Id,
 		Balance:       0,
 	}
-	Database.GetDB().Create(&wallet)
+	Database.DB.Create(&wallet)
 	return nil
 }
 

@@ -11,7 +11,7 @@ import (
 // UpdateCryptoData şu an için işlevsiz çünkü Websocket sürekli olarak değerleri günceleyecek.
 func UpdateCryptoData(c *fiber.Ctx) error {
 	var cryptos []model.Crypto
-	if err := Database.GetDB().Find(&cryptos).Error; err != nil {
+	if err := Database.DB.Find(&cryptos).Error; err != nil {
 		return err
 	}
 	for i := range cryptos {
@@ -22,7 +22,7 @@ func UpdateCryptoData(c *fiber.Ctx) error {
 
 		cryptos[i].Name = exchangeData.From
 		cryptos[i].Price = float64(exchangeData.AmountTo)
-		if err := Database.GetDB().Save(&cryptos[i]).Error; err != nil {
+		if err := Database.DB.Save(&cryptos[i]).Error; err != nil {
 			return err
 		}
 	}
@@ -32,7 +32,7 @@ func UpdateCryptoData(c *fiber.Ctx) error {
 
 func UpdateWSCryptoData(ws *websocket.Conn) {
 	var cryptos []model.Crypto
-	if err := Database.GetDB().Find(&cryptos).Error; err != nil {
+	if err := Database.DB.Find(&cryptos).Error; err != nil {
 		return
 	}
 	for i := range cryptos {
@@ -42,7 +42,7 @@ func UpdateWSCryptoData(ws *websocket.Conn) {
 		}
 
 		// Yeni verilerle mevcut kaydı güncelle ve "name" sütununda çakışma durumunda mevcut kaydı güncelle
-		if err := Database.GetDB().Model(&cryptos[i]).Where("name = ?", cryptos[i].Name).Updates(model.Crypto{
+		if err := Database.DB.Model(&cryptos[i]).Where("name = ?", cryptos[i].Name).Updates(model.Crypto{
 			Name:  exchangeData.From,
 			Price: float64(exchangeData.AmountTo),
 		}).Error; err != nil {

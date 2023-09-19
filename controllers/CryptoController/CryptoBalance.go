@@ -17,12 +17,12 @@ func AccountBalance(c *fiber.Ctx) error {
 	}
 
 	var WalletAddress string
-	if err := Database.GetDB().Model(model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress).Error; err != nil {
+	if err := Database.DB.Model(model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress).Error; err != nil {
 		return err
 	}
 
 	var wallet model.Wallet
-	if err := Database.GetDB().Where("wallet_address = ?", WalletAddress).First(&wallet).Error; err != nil {
+	if err := Database.DB.Where("wallet_address = ?", WalletAddress).First(&wallet).Error; err != nil {
 		return err
 	}
 

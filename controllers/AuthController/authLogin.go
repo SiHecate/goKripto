@@ -21,7 +21,7 @@ func Login(c *fiber.Ctx) error {
 	}
 	var user model.User
 
-	Database.GetDB().Where("email = ?", data["email"]).First(&user)
+	Database.DB.Where("email = ?", data["email"]).First(&user)
 
 	if user.Id == 0 {
 		c.Status(fiber.StatusNotFound)

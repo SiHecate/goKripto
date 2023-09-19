@@ -21,6 +21,6 @@ func User(c *fiber.Ctx) error {
 	}
 	claims := token.Claims.(*jwt.StandardClaims)
 	var user model.User
-	Database.GetDB().Where("id = ?", claims.Issuer).First(&user)
+	Database.DB.Where("id = ?", claims.Issuer).First(&user)
 	return c.JSON(user)
 }

@@ -20,11 +20,15 @@ func AddBalanceCrypto(c *fiber.Ctx) error {
 	addBalance := data["addBalance"].(float64)
 
 	var availableBalance float64
-	Database.GetDB().Model(model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &availableBalance)
+	if err := Database.DB.Model(model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &availableBalance).Error; err != nil {
+		return err
+	}
 
 	TotalBalance := addBalance + availableBalance
 
-	Database.GetDB().Model(model.Wallet{}).Where("user_id = ?", issuer).Update("Balance", TotalBalance)
+	if err := Database.DB.Model(model.Wallet{}).Where("user_id = ?", issuer).Update("Balance", TotalBalance).Error; err != nil {
+		return err
+	}
 
 	type addBalanceResponse struct {
 		Issuer           string  `json:"issuer"`

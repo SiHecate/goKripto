@@ -3,5 +3,5 @@ package Database
 import model "gokripto/Model"
 
 func migrateCrypto() {
-	GetDB().AutoMigrate(&model.Crypto{})
+	DB.AutoMigrate(&model.Crypto{})
 }

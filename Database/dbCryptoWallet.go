@@ -5,5 +5,5 @@ import (
 )
 
 func migrateCryptoWallet() {
-	GetDB().AutoMigrate(&model.CryptoWallet{})
+	DB.AutoMigrate(&model.CryptoWallet{})
 }

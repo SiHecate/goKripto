@@ -16,7 +16,7 @@ func TransactionCryptos(c *fiber.Ctx, UserID string, price float64, cryptoname s
 		Type:       transactionType,
 	}
 
-	if err := Database.GetDB().Create(&Transaction).Error; err != nil {
+	if err := Database.DB.Create(&Transaction).Error; err != nil {
 		return err
 	}
 

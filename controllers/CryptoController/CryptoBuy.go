@@ -45,10 +45,14 @@ func BuyCryptos(c *fiber.Ctx) error {
 	}
 
 	var cryptoPrice float64
-	Database.GetDB().Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice)
+	if err := Database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice).Error; err != nil {
+		return err
+	}
 
 	var userBalance float64
-	Database.GetDB().Model(&model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &userBalance)
+	if err := Database.DB.Model(&model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &userBalance).Error; err != nil {
+		return err
+	}
 
 	totalCost := cryptoPrice * amountToBuy
 	totalBalance := userBalance - totalCost
@@ -63,13 +67,19 @@ func BuyCryptos(c *fiber.Ctx) error {
 		})
 	}
 
-	Database.GetDB().Model(&model.Wallet{}).Where("user_id = ?", issuer).Update("balance", totalBalance)
+	if err := Database.DB.Model(&model.Wallet{}).Where("user_id = ?", issuer).Update("balance", totalBalance).Error; err != nil {
+		return err
+	}
 
 	//Crypto Wallet
 	var cryptoID int
-	Database.GetDB().Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("id", &cryptoID)
+	if err := Database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("id", &cryptoID).Error; err != nil {
+		return err
+	}
 	var WalletAddress string
-	Database.GetDB().Model(&model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress)
+	if err := Database.DB.Model(&model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress).Error; err != nil {
+		return err
+	}
 
 	TransactionCryptos(c, issuer, cryptoPrice, cryptoName, amountToBuy, "Buy")
 	CryptoWallet(cryptoID, cryptoName, cryptoPrice, amountToBuy, WalletAddress, "buy")

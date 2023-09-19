@@ -7,7 +7,7 @@ import (
 
 func CryptoWallet(CryptoID int, CryptoName string, CryptoPrice float64, Amount float64, WalletAddress string, ProcessType string) {
 	var existingCryptoWallet model.CryptoWallet
-	result := Database.GetDB().Where("wallet_address = ? AND crypto_name = ?", WalletAddress, CryptoName).First(&existingCryptoWallet)
+	result := Database.DB.Where("wallet_address = ? AND crypto_name = ?", WalletAddress, CryptoName).First(&existingCryptoWallet)
 
 	if ProcessType == "buy" {
 		if result.Error != nil {
@@ -19,11 +19,11 @@ func CryptoWallet(CryptoID int, CryptoName string, CryptoPrice float64, Amount f
 				WalletAddress:    WalletAddress,
 				Amount:           Amount,
 			}
-			Database.GetDB().Create(&CryptoWallet)
+			Database.DB.Create(&CryptoWallet)
 		} else {
 			existingCryptoWallet.Amount += Amount
 			existingCryptoWallet.CryptoTotalPrice = CryptoPrice * existingCryptoWallet.Amount
-			Database.GetDB().Save(&existingCryptoWallet)
+			Database.DB.Save(&existingCryptoWallet)
 		}
 	} else if ProcessType == "sell" {
 		if result.Error != nil {
@@ -35,11 +35,11 @@ func CryptoWallet(CryptoID int, CryptoName string, CryptoPrice float64, Amount f
 				WalletAddress:    WalletAddress,
 				Amount:           Amount,
 			}
-			Database.GetDB().Create(&CryptoWallet)
+			Database.DB.Create(&CryptoWallet)
 		} else {
 			existingCryptoWallet.Amount -= Amount
 			existingCryptoWallet.CryptoTotalPrice = CryptoPrice * existingCryptoWallet.Amount
-			Database.GetDB().Save(&existingCryptoWallet)
+			Database.DB.Save(&existingCryptoWallet)
 		}
 
 	}

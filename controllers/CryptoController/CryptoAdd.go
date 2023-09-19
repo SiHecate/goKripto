@@ -17,7 +17,7 @@ func AddCryptoData(c *fiber.Ctx) error {
 		}
 
 		var existingCrypto model.Crypto
-		if err := Database.GetDB().Where("name = ?", exchangeData.FromNetwork).First(&existingCrypto).Error; err == nil {
+		if err := Database.DB.Where("name = ?", exchangeData.FromNetwork).First(&existingCrypto).Error; err == nil {
 			return c.Status(fiber.StatusConflict).JSON(fiber.Map{
 				"message": "Crypto already exists in the database.",
 			})
@@ -28,7 +28,7 @@ func AddCryptoData(c *fiber.Ctx) error {
 			Price: float64(exchangeData.AmountTo),
 		}
 
-		if err := Database.GetDB().Create(&crypto).Error; err != nil {
+		if err := Database.DB.Create(&crypto).Error; err != nil {
 			return err
 		}
 	}
