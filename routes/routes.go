@@ -41,19 +41,19 @@ func Setup(app *fiber.App) {
 	}
 
 	// Post
-	app.Post("/api/register", timeoutHandler, AuthController.Register)
-	app.Post("/api/login", timeoutHandler, AuthController.Login)
-	app.Post("/api/logout", timeoutHandler, AuthController.Logout)
-	app.Post("/api/cryptoBuy", timeoutHandler, CryptoControllers.BuyCryptos)
-	app.Post("/api/cryptoSell", timeoutHandler, CryptoControllers.SellCryptos)
-	app.Post("/api/addBalance", timeoutHandler, CryptoControllers.AddBalanceCrypto)
+	app.Post("/api/register", timeoutHandler, AuthController.Register)              // Done
+	app.Post("/api/login", timeoutHandler, AuthController.Login)                    // Done
+	app.Post("/api/logout", timeoutHandler, AuthController.Logout)                  // Done
+	app.Post("/api/cryptoBuy", timeoutHandler, CryptoControllers.BuyCryptos)        // Done
+	app.Post("/api/cryptoSell", timeoutHandler, CryptoControllers.SellCryptos)      // Done
+	app.Post("/api/addBalance", timeoutHandler, CryptoControllers.AddBalanceCrypto) // Done
 
 	// Get
-	app.Get("/api/transactionHistory", timeoutHandler, CryptoControllers.TransactionList)
-	app.Get("/api/user", timeoutHandler, AuthController.User)
-	app.Get("/api/balance", timeoutHandler, CryptoControllers.AccountBalance)
-	app.Get("/api/cryptoAdd", CryptoControllers.AddCryptoData)
-	app.Get("/api/cryptoUpdate", timeoutHandler, CryptoControllers.UpdateCryptoData)
-	app.Get("/api/cryptoList", timeoutHandler, CryptoControllers.ListAllCryptos)
-	app.Get("/api/listcryptowallet", timeoutHandler, CryptoControllers.ListCryptoWallet)
+	app.Get("/api/transactionHistory", timeoutHandler, CryptoControllers.TransactionList) // Done
+	app.Get("/api/user", timeoutHandler, AuthController.User)                             // Done
+	app.Get("/api/balance", timeoutHandler, CryptoControllers.AccountBalance)             // Done
+	app.Get("/api/cryptoAdd", CryptoControllers.AddCryptoData)                            // ?
+	app.Get("/api/cryptoUpdate", CryptoControllers.UpdateCryptoData)                      // Done
+	app.Get("/api/cryptoList", timeoutHandler, CryptoControllers.ListAllCryptos)          // Done
+	app.Get("/api/listcryptowallet", timeoutHandler, CryptoControllers.ListCryptoWallet)  // Done
 }

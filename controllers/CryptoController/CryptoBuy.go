@@ -58,7 +58,6 @@ func BuyCryptos(c *fiber.Ctx) error {
 	totalBalance := userBalance - totalCost
 
 	if totalCost > userBalance {
-		// Hata kontrolü: Yetersiz bakiye durumu
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
 			"message": "Insufficient balance",

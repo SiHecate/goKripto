@@ -47,9 +47,7 @@ func SellCryptos(c *fiber.Ctx) error {
 	}
 
 	var cryptoPrice float64
-	if err := Database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice).Error; err != nil {
-		return err
-	}
+	Database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice)
 
 	totalProfit := cryptoPrice * amountToSell
 	totalBalance := userBalance + totalProfit
