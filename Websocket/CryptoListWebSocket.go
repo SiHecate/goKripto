@@ -26,6 +26,7 @@ func StartWebSocket(app *fiber.App) {
 		// Websocket
 		for range ticker.C {
 			CryptoController.UpdateWSCryptoData(ws)
+			CryptoController.UpdateWalletCryptos(ws)
 		}
 
 		log.Printf("WebSocket port off!: %s", ws.Params("id"))

@@ -10,7 +10,10 @@ import (
 func AddBalanceCrypto(c *fiber.Ctx) error {
 	issuer, err := GetToken(c)
 	if err != nil {
-		c.Status(fiber.StatusBadRequest)
+		c.Status(fiber.StatusUnauthorized)
+		return c.JSON(fiber.Map{
+			"message": "unauthenticated",
+		})
 	}
 
 	var data map[string]interface{}

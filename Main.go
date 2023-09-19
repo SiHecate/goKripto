@@ -1,6 +1,7 @@
 package main
 
 import (
+	"gokripto/Database"
 	websocket "gokripto/Websocket"
 	CryptoControllers "gokripto/controllers/CryptoController"
 	"gokripto/routes"
@@ -12,7 +13,7 @@ import (
 
 func main() {
 	CryptoControllers.CryptoBill()
-	// Database.Connect()
+	Database.Connect()
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
