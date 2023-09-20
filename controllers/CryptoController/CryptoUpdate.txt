@@ -1,0 +1,45 @@
+package controllers
+
+import (
+	"gokripto/Database"
+	model "gokripto/Model"
+
+	"github.com/gofiber/contrib/websocket"
+)
+
+func WebSocketUpdateCrypto(ws *websocket.Conn) {
+	// WebSocket üzerinden bağlantı kurulduğunda veritabanından crypto verilerini alın.
+	var cryptos []model.Crypto
+	if err := Database.DB.Find(&cryptos).Error; err != nil {
+		// Veritabanı hatası durumunda WebSocket bağlantısını kapatın.
+		ws.Close()
+		return
+	}
+
+	// Veritabanındaki her crypto için güncel veriyi alın ve güncelleyin.
+	for i := range cryptos {
+		cryptoData, err := GetCryptoData(cryptos[i].Name)
+		if err != nil {
+			// Veri alımı sırasında hata oluşursa bu crypto'yu atlayın.
+			continue
+		}
+
+		// Crypto verisini güncelle
+		cryptos[i].Name = cryptoData.Name
+		cryptos[i].Price = float64(cryptoData.Price)
+
+		// Veritabanındaki crypto verisini güncelle
+		if err := Database.DB.Save(&cryptos[i]).Error; err != nil {
+			// Güncelleme hatası durumunda WebSocket bağlantısını kapatın.
+			ws.Close()
+			return
+		}
+	}
+
+	// Güncellenmiş crypto verilerini WebSocket üzerinden gönderin.
+	if err := ws.WriteJSON(cryptos); err != nil {
+		// WebSocket üzerinden veri gönderme hatası durumunda bağlantıyı kapatın.
+		ws.Close()
+		return
+	}
+}

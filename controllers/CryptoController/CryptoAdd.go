@@ -1,51 +1,69 @@
 package controllers
 
 import (
+	"encoding/json"
 	"gokripto/Database"
 	model "gokripto/Model"
+	"net/http"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-var cryptoNames = []string{"btc", "eth", "ltc", "xmr", "bch", "bnb"}
+func AddAllCryptoData(c *fiber.Ctx) error {
+	apiURL := "https://api.coincap.io/v2/assets"
 
-func AddCryptoData(c *fiber.Ctx) error {
-	for _, cryptoName := range cryptoNames {
-		if cryptoExists(cryptoName) {
-			return c.Status(fiber.StatusConflict).JSON(fiber.Map{
-				"message": "Crypto already exists in the database.",
+	response, err := http.Get(apiURL)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Failed to fetch crypto data from the API.",
+			"error":   err.Error(),
+		})
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "HTTP Error: " + strconv.Itoa(response.StatusCode),
+		})
+	}
+
+	var cryptoAPIResponse model.CryptoAPIResponse
+	err = json.NewDecoder(response.Body).Decode(&cryptoAPIResponse)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Failed to parse API response.",
+			"error":   err.Error(),
+		})
+	}
+
+	for _, crypto := range cryptoAPIResponse.Data {
+		if err := createCrypto(crypto.Symbol, crypto.Name, crypto.PriceUsd); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"message": "Failed to add or update crypto data in the database.",
+				"error":   err.Error(),
 			})
-		}
-
-		if err := createCrypto(cryptoName); err != nil {
-			return err
 		}
 	}
 
 	return c.JSON(fiber.Map{
-		"message": "Crypto data added successfully",
+		"message": "All crypto data added or updated successfully",
 	})
 }
 
-func cryptoExists(name string) bool {
-	var existingCrypto model.Crypto
-	if err := Database.DB.Where("name = ?", name).First(&existingCrypto).Error; err == nil {
-		return true
-	}
-	return false
-}
-
-func createCrypto(name string) error {
-	exchangeData, err := GetExchangeRate(name)
+func createCrypto(symbol string, name string, price string) error {
+	// Dönüşüm işlemi: API'den gelen price stringini bir float64'e çevirin
+	priceFloat, err := strconv.ParseFloat(price, 64)
 	if err != nil {
 		return err
 	}
 
+	// Kayıt bulunamadıysa yeni kayıt ekle
 	crypto := model.Crypto{
-		Name:  name,
-		Price: float64(exchangeData.AmountTo),
+		Symbol: symbol,
+		Name:   name,
+		Price:  priceFloat,
 	}
-
 	if err := Database.DB.Create(&crypto).Error; err != nil {
 		return err
 	}

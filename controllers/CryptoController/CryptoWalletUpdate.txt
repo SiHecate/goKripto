@@ -24,13 +24,18 @@ func UpdateWalletCryptos(ws *websocket.Conn) {
 			continue
 		}
 
-		price := float64(exchangeData.AmountTo)
+		price := float64(exchangeData.Amount)
 		newPrice := price * totalAmount
 
 		if err := Database.DB.Model(&model.CryptoWallet{}).Where("crypto_name = ?", cryptoWallet[i].CryptoName).Updates(model.CryptoWallet{
-			CryptoName:       exchangeData.From,
+			CryptoName:       exchangeData.Base,
 			CryptoTotalPrice: newPrice,
 		}).Error; err != nil {
+			continue
+		}
+
+		// WebSocket üzerinden güncellenmiş verileri gönder
+		if err := ws.WriteJSON(cryptoWallet[i]); err != nil {
 			continue
 		}
 	}

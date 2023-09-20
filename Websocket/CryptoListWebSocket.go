@@ -1,7 +1,6 @@
 package websocket
 
 import (
-	CryptoController "gokripto/controllers/CryptoController"
 	"log"
 	"time"
 
@@ -25,8 +24,7 @@ func StartWebSocket(app *fiber.App) {
 
 		// Websocket
 		for range ticker.C {
-			CryptoController.UpdateWSCryptoData(ws)
-			CryptoController.UpdateWalletCryptos(ws)
+			// controllers.WebSocketUpdateCrypto(ws)
 		}
 
 		log.Printf("WebSocket port off!: %s", ws.Params("id"))
