@@ -75,7 +75,7 @@ func SellCryptos(c *fiber.Ctx) error {
 	}
 
 	TransactionBalance(c, issuer, totalProfit, "Sales", "Crypto Sales")
-	TransactionCryptos(c, issuer, cryptoPrice, cryptoName, amountToSell, "Sell")
+	TransactionCryptos(c, issuer, WalletAddress, cryptoPrice, cryptoName, amountToSell, "Sell")
 	CryptoWallet(cryptoID, cryptoName, cryptoPrice, amountToSell, WalletAddress, "sell")
 
 	type SellCryptoResponse struct {

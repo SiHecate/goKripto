@@ -81,7 +81,7 @@ func BuyCryptos(c *fiber.Ctx) error {
 	}
 
 	TransactionBalance(c, issuer, totalCost, "Purchase", "Crypto Purchase")
-	TransactionCryptos(c, issuer, cryptoPrice, cryptoName, amountToBuy, "Buy")
+	TransactionCryptos(c, issuer, WalletAddress, cryptoPrice, cryptoName, amountToBuy, "Buy")
 	CryptoWallet(cryptoID, cryptoName, cryptoPrice, amountToBuy, WalletAddress, "buy")
 
 	type BuyCryptoResponse struct {

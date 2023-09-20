@@ -8,14 +8,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func TransactionCryptos(c *fiber.Ctx, UserID string, price float64, cryptoname string, amount float64, transactionType string) error {
+func TransactionCryptos(c *fiber.Ctx, UserID string, WalletAddres string, price float64, cryptoname string, amount float64, transactionType string) error {
 	TransactionCryptos := model.TransactionCrypto{
-		UserID:     UserID,
-		Price:      float64(price),
-		CryptoName: cryptoname,
-		Amount:     float64(amount),
-		Type:       transactionType,
-		Date:       time.Now(),
+		UserID:       UserID,
+		WalletAddres: WalletAddres,
+		Price:        float64(price),
+		CryptoName:   cryptoname,
+		Amount:       float64(amount),
+		Type:         transactionType,
+		Date:         time.Now(),
 	}
 
 	if err := Database.DB.Create(&TransactionCryptos).Error; err != nil {

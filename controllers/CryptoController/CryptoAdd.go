@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-var cryptoNames = []string{"btc", "eth", "ltc"}
+var cryptoNames = []string{"btc", "eth", "ltc", "xmr", "bch", "bnb"}
 
 func AddCryptoData(c *fiber.Ctx) error {
 	for _, cryptoName := range cryptoNames {
