@@ -2,107 +2,86 @@ package controllers
 
 import (
 	"fmt"
+	"gokripto/Database"
+	model "gokripto/Model"
+	"log"
+	"os"
+	"time"
 
-	"github.com/johnfercher/maroto/pkg/color"
-	"github.com/johnfercher/maroto/pkg/consts"
-	"github.com/johnfercher/maroto/pkg/pdf"
-	"github.com/johnfercher/maroto/pkg/props"
+	generator "github.com/angelodlfrtr/go-invoice-generator"
 )
 
-func CryptoBill() {
-	m := pdf.NewMaroto(consts.Portrait, consts.A5)
-	m.SetPageMargins(40, 10, 40)
+// Update gerekiyor şu an için kullanım dışı
 
-	buildingHeading(m)
-	buildingList(m)
-	m.OutputFileAndClose("/home/umut/goKripto/Pdfs/deneme.pdf")
-	fmt.Println("a")
-}
-
-func buildingHeading(m pdf.Maroto) {
-	m.RegisterHeader(func() {
-		m.Row(25, func() {
-			m.Col(12, func() {
-				m.FileImage("Pdfs/Images/proxolab.jpg", props.Rect{
-					Center: true,
-				})
-			})
-		})
-	})
-
-	m.Row(0, func() {
-		m.Col(0, func() {
-			m.Text("Deneme123+%&/", props.Text{
-				Top:   0,
-				Style: consts.Bold,
-				Align: consts.Center,
-				Color: color.NewBlack(),
-			})
-		})
-	})
-}
-
-func buildingList(m pdf.Maroto) {
-	tableHeadings := []string{"Crypto Name", "Amount", "Price", "Deneme"}
-	contents := [][]string{
-		{"Bitcoin", "10", "$50000", "Sample1"},
-		{"Ethereum", "5", "$3000", "Sample2"},
-		{"Litecoin", "20", "$150", "Sample3"},
+func BillGenerator(UserID string, price float64, cryptoname string, amount float64, transactionType string) {
+	directoryFileTime := time.Now()
+	var directoryUserName string
+	if err := Database.DB.Model(&model.User{}).Where("id", UserID).Pluck("name", &directoryUserName).Error; err != nil {
+		log.Fatal(err)
 	}
 
-	lightPurpleColor := getLightDark()
-	m.Row(10, func() {
-		m.Col(12, func() {
-			m.Text("Denemeeee", props.Text{
-				Top:    2,
-				Size:   13,
-				Color:  color.NewWhite(),
-				Family: consts.Courier,
-				Style:  consts.Bold,
-				Align:  consts.Center,
-			})
-		})
+	var walletAddress string
+	if err := Database.DB.Model(&model.User{}).Where("id", UserID).Pluck("wallet_address", &walletAddress).Error; err != nil {
+		log.Fatal(err)
+	}
+
+	var directoryFileName string
+	directoryFileName = UserID + "_" + directoryUserName + "_" + directoryFileTime.Format("20060102_15041") + ".pdf"
+
+	doc, _ := generator.New(generator.DeliveryNote, &generator.Options{
+		TextTypeInvoice: "FACTUasdasdasRE",
+		AutoPrint:       false,
 	})
 
-	m.SetBackgroundColor(color.NewWhite())
+	doc.SetRef("testref")
 
-	m.TableList(tableHeadings, contents, props.TableList{
-		HeaderProp: props.TableListContent{
-			Size:      9,
-			GridSizes: []uint{4, 7, 2, 4}, // Burada sütun genişliklerini ayarlayın
+	doc.SetDescription("Crypto Exchange")
+
+	doc.SetDate(time.Now().Format("2006/01/02 15:04"))
+
+	logoBytes, err := os.ReadFile("/home/umut/goKripto/Pdfs/Images/proxolab.jpg")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	doc.SetCompany(&generator.Contact{
+		Name: "Proxolab",
+		Logo: logoBytes,
+		Address: &generator.Address{
+			Address:    "Çamlaraltı, 6025.",
+			Address2:   "Apartman No: 9",
+			PostalCode: "20160",
+			City:       "Denizli",
+			Country:    "Türkiye",
 		},
-		ContentProp: props.TableListContent{
-			Size:      8,
-			GridSizes: []uint{4, 7, 2, 4}, // Burada sütun genişliklerini ayarlayın
-		},
-		Align:                consts.Left,
-		AlternatedBackground: &lightPurpleColor,
-		HeaderContentSpace:   1,
-		Line:                 false,
 	})
 
-}
-
-func getDarkPurpleColor() color.Color {
-	return color.Color{
-		Red:   88,
-		Green: 80,
-		Blue:  99,
+	var customerAddress = &generator.Address{
+		Address: walletAddress,
 	}
-}
 
-func getLightPurpleColor() color.Color {
-	return color.Color{
-		Red:   210,
-		Green: 200,
-		Blue:  230,
+	doc.SetCustomer(&generator.Contact{
+		Name:    directoryUserName,
+		Address: customerAddress,
+	})
+
+	unitCostStr := fmt.Sprintf("%.2f", price)
+	quantityStr := fmt.Sprintf("%.2f", amount)
+
+	doc.AppendItem(&generator.Item{
+		Name:        cryptoname,
+		Description: transactionType,
+		UnitCost:    unitCostStr,
+		Quantity:    quantityStr,
+	})
+
+	pdf, err := doc.Build()
+	if err != nil {
+		log.Fatal(err)
 	}
-}
-
-func getLightDark() color.Color {
-	return color.Color{
-		Red:   153,
-		Green: 153,
-		Blue:  153,
+	os.MkdirAll("/home/umut/goKripto/Pdfs/", os.ModePerm)
+	err = pdf.OutputFileAndClose("/home/umut/goKripto/Pdfs/" + directoryFileName)
+	if err != nil {
+		log.Fatal(err)
 	}
 }

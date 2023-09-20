@@ -23,6 +23,6 @@ func TransactionCryptos(c *fiber.Ctx, UserID string, price float64, cryptoname s
 	}
 
 	return c.JSON(fiber.Map{
-		"message": "Transaction successful",
+		"message": "Transacton successful",
 	})
 }

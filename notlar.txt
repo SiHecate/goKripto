@@ -22,3 +22,4 @@ https://api.swapzone.io/v1/exchange/get-rate?from=uscd&to=usdt&amount=1
 * Route'lara erişimi bu süreye göre ayarla
 that's it teşekkürler thank you
 
+git config --global --add safe.directory [/app]

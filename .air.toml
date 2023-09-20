@@ -7,7 +7,7 @@ tmp_dir = "tmp"
 # Just plain old shell command. You could use `make` as well.
 cmd = "go build -o ./tmp/main ."
 # Binary file yields from `cmd`.
-bin = "tmp/main"
+bin = "./tmp/main"
 # Customize binary.
 full_bin = "APP_ENV=dev APP_USER=air ./tmp/main"
 # Watch these filename extensions.
@@ -39,3 +39,4 @@ runner = "green"
 [misc]
 # Delete tmp directory on exit
 clean_on_exit = true
+

@@ -34,6 +34,20 @@ require (
 )
 
 require (
+	github.com/cockroachdb/apd v1.1.0 // indirect
+	github.com/creasty/defaults v1.6.0 // indirect
+	github.com/go-pdf/fpdf v0.6.0 // indirect
+	github.com/go-playground/locales v0.14.0 // indirect
+	github.com/go-playground/universal-translator v0.18.0 // indirect
+	github.com/go-playground/validator/v10 v10.11.0 // indirect
+	github.com/leekchan/accounting v0.3.1 // indirect
+	github.com/leodido/go-urn v1.2.1 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	github.com/shopspring/decimal v1.3.1 // indirect
+)
+
+require (
+	github.com/angelodlfrtr/go-invoice-generator v0.6.0
 	github.com/boombuler/barcode v1.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fasthttp/websocket v1.5.4 // indirect

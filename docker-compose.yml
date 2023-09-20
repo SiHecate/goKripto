@@ -22,9 +22,10 @@ services:
       - postgres
     ports:
       - "3000:3000"
-    command: air ./cmd/main.go -b 0.0.0.0
+    command: air ./main.go -b 0.0.0.0 
     volumes:
       - ./:/app
+      - ./Pdfs:/home/umut/goKripto/Pdfs
 
 volumes:
   postgres-db:

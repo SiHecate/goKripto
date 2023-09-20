@@ -10,7 +10,6 @@ import (
 func UpdateWalletCryptos(ws *websocket.Conn) {
 	var cryptoWallet []model.CryptoWallet
 	if err := Database.DB.Find(&cryptoWallet).Error; err != nil {
-		// Hata işleme kodu buraya gelebilir.
 		return
 	}
 
