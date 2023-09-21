@@ -17,7 +17,6 @@ func ListAllCryptos(c *fiber.Ctx) error {
 }
 
 func ListCryptoWallet(c *fiber.Ctx) error {
-	// UpdateCryptoData(c)
 	issuer, err := GetToken(c)
 	if err != nil {
 		c.Status(fiber.StatusUnauthorized)

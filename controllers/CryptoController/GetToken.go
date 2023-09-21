@@ -5,6 +5,7 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+// Extract the token and issuer (user ID) from the JWT token.
 func GetToken(c *fiber.Ctx) (string, error) {
 	cookie := c.Cookies("jwt")
 	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {

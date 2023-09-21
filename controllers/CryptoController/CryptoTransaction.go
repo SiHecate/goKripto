@@ -19,6 +19,7 @@ func TransactionCryptos(c *fiber.Ctx, UserID string, WalletAddres string, price 
 		Date:         time.Now(),
 	}
 
+	// Create crypto transaction database
 	if err := Database.DB.Create(&TransactionCryptos).Error; err != nil {
 		return err
 	}

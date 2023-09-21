@@ -9,9 +9,10 @@ import (
 
 const SecretKey = "secret"
 
+// BuyCryptos handles the purchase of cryptocurrencies.
 func BuyCryptos(c *fiber.Ctx) error {
-	// UpdateCryptoData(c)
 
+	// Get the issuer (user ID) from the JWT token.
 	issuer, err := GetToken(c)
 	if err != nil {
 		c.Status(fiber.StatusUnauthorized)
@@ -28,6 +29,7 @@ func BuyCryptos(c *fiber.Ctx) error {
 		})
 	}
 
+	// Extract cryptoName and amountToBuy from the request data.
 	cryptoName, ok := data["cryptoName"].(string)
 	if !ok {
 		c.Status(fiber.StatusBadRequest)
@@ -44,19 +46,23 @@ func BuyCryptos(c *fiber.Ctx) error {
 		})
 	}
 
+	// Fetch the price of the selected cryptocurrency from the database.
 	var cryptoPrice float64
 	if err := Database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice).Error; err != nil {
 		return err
 	}
 
+	// Fetch the user's current balance from the wallet.
 	var userBalance float64
 	if err := Database.DB.Model(&model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &userBalance).Error; err != nil {
 		return err
 	}
 
+	// Calculate the total cost of the purchase.
 	totalCost := cryptoPrice * amountToBuy
 	totalBalance := userBalance - totalCost
 
+	// Check if the user has sufficient balance for the purchase.
 	if totalCost > userBalance {
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
@@ -66,12 +72,13 @@ func BuyCryptos(c *fiber.Ctx) error {
 		})
 	}
 
+	// Update the user's wallet balance.
 	if err := Database.DB.Model(&model.Wallet{}).Where("user_id = ?", issuer).Update("balance", totalBalance).Error; err != nil {
 		return err
 	}
 
-	//Crypto Wallet
-	var cryptoID int
+	// Fetch the cryptocurrency's ID and user's wallet address.
+	var cryptoID uint
 	if err := Database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("id", &cryptoID).Error; err != nil {
 		return err
 	}
@@ -80,19 +87,22 @@ func BuyCryptos(c *fiber.Ctx) error {
 		return err
 	}
 
-	TransactionBalance(c, issuer, totalCost, "Purchase", "Crypto Purchase")
+	// Perform transactions and update the crypto wallet.
+	TransactionBalance(c, issuer, WalletAddress, totalCost, "Purchase", "Crypto Purchase")
 	TransactionCryptos(c, issuer, WalletAddress, cryptoPrice, cryptoName, amountToBuy, "Buy")
 	CryptoWallet(cryptoID, cryptoName, cryptoPrice, amountToBuy, WalletAddress, "buy")
 
+	// Define a response structure.
 	type BuyCryptoResponse struct {
 		TotalCost     float64 `json:"totalCost"`
 		CryptoName    string  `json:"cryptoName"`
 		AmountToBuy   float64 `json:"amountToBuy"`
 		Issuer        string  `json:"issuer"`
 		UserBalance   float64 `json:"userBalance"`
-		UserBalanceAB float64 `json:"userBalanceAB"`
-		CryptoID      int     `json:"cryptoID"`
+		UserBalanceAB float64 `json:"newUserBalance"`
 	}
+
+	// Create a response object.
 	response := BuyCryptoResponse{
 		TotalCost:     totalCost,
 		CryptoName:    cryptoName,
@@ -102,5 +112,6 @@ func BuyCryptos(c *fiber.Ctx) error {
 		UserBalanceAB: totalBalance,
 	}
 
+	// Return a JSON response with the purchase details.
 	return c.Status(200).JSON(response)
 }

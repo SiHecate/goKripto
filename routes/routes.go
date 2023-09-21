@@ -53,7 +53,6 @@ func Setup(app *fiber.App) {
 	app.Get("/api/BalanceTransactionHistory", timeoutHandler, CryptoControllers.TransactionListBalance) // Done
 	app.Get("/api/user", timeoutHandler, AuthController.User)                                           // Done
 	app.Get("/api/balance", timeoutHandler, CryptoControllers.AccountBalance)                           // Done
-	app.Get("/api/cryptoAdd", CryptoControllers.AddAllCryptoData)                                       // ?
 	app.Get("/api/cryptoList", timeoutHandler, CryptoControllers.ListAllCryptos)                        // Done
 	app.Get("/api/listcryptowallet", timeoutHandler, CryptoControllers.ListCryptoWallet)                // Done
 }

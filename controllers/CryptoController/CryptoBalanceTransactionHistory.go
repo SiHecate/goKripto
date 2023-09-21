@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// List function for transaction of balance
 func TransactionListBalance(c *fiber.Ctx) error {
 	issuer, err := GetToken(c)
 	if err != nil {
@@ -20,5 +21,6 @@ func TransactionListBalance(c *fiber.Ctx) error {
 	if err := Database.DB.Where("user_id = ?", issuer).Find(&TransactionBalance).Error; err != nil {
 		return err
 	}
+
 	return c.JSON(TransactionBalance)
 }

@@ -7,10 +7,10 @@ import (
 type TransactionCrypto struct {
 	ID           uint      `json:"transactionID" gorm:"unique"`
 	UserID       string    `json:"userID"`
-	WalletAddres string    `json:"WalletAddress"`
-	CryptoName   string    `json:"cryptoname"`
-	Price        float64   `json:"price"`
-	Amount       float64   `json:"quantity"`
-	Type         string    `json:"type"`
-	Date         time.Time `json:"date"`
+	WalletAddres string    `json:"walletAddress"`
+	CryptoName   string    `json:"cryptoName"`
+	Price        float64   `json:"cryptoPrice"`
+	Amount       float64   `json:"cryptoAmount"`
+	Type         string    `json:"transactionType"`
+	Date         time.Time `json:"transactionDate"`
 }

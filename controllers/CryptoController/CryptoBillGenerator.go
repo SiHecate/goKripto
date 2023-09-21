@@ -11,7 +11,7 @@ import (
 	generator "github.com/angelodlfrtr/go-invoice-generator"
 )
 
-// Update gerekiyor şu an için kullanım dışı
+// It's not recommended for use in its current development stage.
 
 func BillGenerator(UserID string, price float64, cryptoname string, amount float64, transactionType string) {
 	directoryFileTime := time.Now()
