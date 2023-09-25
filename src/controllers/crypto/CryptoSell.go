@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"gokripto/Database"
 	model "gokripto/Model"
+	"gokripto/database"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -46,35 +46,35 @@ func SellCryptos(c *fiber.Ctx) error {
 	// Fetch the user's wallet and balance from the database using GORM.
 	var wallet model.Wallet
 	var userBalance float64
-	if err := Database.DB.Where("user_id = ?", issuer).First(&wallet).Error; err != nil {
+	if err := database.DB.Where("user_id = ?", issuer).First(&wallet).Error; err != nil {
 		return err
 	}
 	wallet.Balance = userBalance
 
 	// Fetch the price of the selected cryptocurrency from the database.
 	var cryptoPrice float64
-	Database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice)
+	database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice)
 
 	// Calculate the total profit from the sale and update the user's balance.
 	totalProfit := cryptoPrice * amountToSell
 	totalBalance := userBalance + totalProfit
-	if err := Database.DB.Model(&model.Wallet{}).Where("user_id = ?", issuer).Update("balance", totalBalance).Error; err != nil {
+	if err := database.DB.Model(&model.Wallet{}).Where("user_id = ?", issuer).Update("balance", totalBalance).Error; err != nil {
 		return err
 	}
 
 	// Fetch the ID of the selected cryptocurrency and the user's wallet address.
 	var cryptoID uint
-	if err := Database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("id", &cryptoID).Error; err != nil {
+	if err := database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("id", &cryptoID).Error; err != nil {
 		return err
 	}
 	var WalletAddress string
-	if err := Database.DB.Model(&model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress).Error; err != nil {
+	if err := database.DB.Model(&model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress).Error; err != nil {
 		return err
 	}
 
 	// Fetch the cryptocurrency amount from the crypto wallet and check for invalid values.
 	var cryptocurrency float64
-	Database.DB.Model(&model.CryptoWallet{}).Where("wallet_address = ? AND crypto_name = ?", WalletAddress, cryptoName).Pluck("amount", &cryptocurrency)
+	database.DB.Model(&model.CryptoWallet{}).Where("wallet_address = ? AND crypto_name = ?", WalletAddress, cryptoName).Pluck("amount", &cryptocurrency)
 	if cryptocurrency < 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "invalid number",

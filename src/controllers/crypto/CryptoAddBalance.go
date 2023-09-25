@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"gokripto/Database"
 	model "gokripto/Model"
+	"gokripto/database"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -25,19 +25,19 @@ func AddBalanceCrypto(c *fiber.Ctx) error {
 	addBalance := data["addBalance"].(float64)
 
 	var WalletAddress string
-	if err := Database.DB.Model(&model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress).Error; err != nil {
+	if err := database.DB.Model(&model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress).Error; err != nil {
 		return err
 	}
 
 	var availableBalance float64
-	if err := Database.DB.Model(model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &availableBalance).Error; err != nil {
+	if err := database.DB.Model(model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &availableBalance).Error; err != nil {
 		return err
 	}
 
 	// Total balance calculation
 	TotalBalance := addBalance + availableBalance
 
-	if err := Database.DB.Model(model.Wallet{}).Where("user_id = ?", issuer).Update("Balance", TotalBalance).Error; err != nil {
+	if err := database.DB.Model(model.Wallet{}).Where("user_id = ?", issuer).Update("Balance", TotalBalance).Error; err != nil {
 		return err
 	}
 

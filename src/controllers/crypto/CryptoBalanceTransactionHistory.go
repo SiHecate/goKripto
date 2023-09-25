@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"gokripto/Database"
 	model "gokripto/Model"
+	"gokripto/database"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,7 +18,7 @@ func TransactionListBalance(c *fiber.Ctx) error {
 	}
 
 	var TransactionBalance []model.TransactionBalance
-	if err := Database.DB.Where("user_id = ?", issuer).Find(&TransactionBalance).Error; err != nil {
+	if err := database.DB.Where("user_id = ?", issuer).Find(&TransactionBalance).Error; err != nil {
 		return err
 	}
 

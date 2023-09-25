@@ -1,8 +1,8 @@
 package routes
 
 import (
-	AuthController "gokripto/controllers/AuthController"
-	CryptoControllers "gokripto/controllers/CryptoController"
+	AuthController "gokripto/src/controllers/auth"
+	CryptoControllers "gokripto/src/controllers/crypto"
 	"log"
 	"time"
 

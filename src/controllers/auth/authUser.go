@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"gokripto/Database"
 	model "gokripto/Model"
+	"gokripto/database"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
@@ -24,6 +24,6 @@ func User(c *fiber.Ctx) error {
 
 	// Return user info for table
 	var user model.User
-	Database.DB.Where("id = ?", claims.Issuer).First(&user)
+	database.DB.Where("id = ?", claims.Issuer).First(&user)
 	return c.JSON(user)
 }

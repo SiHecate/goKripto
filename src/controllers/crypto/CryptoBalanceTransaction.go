@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"gokripto/Database"
 	model "gokripto/Model"
+	"gokripto/database"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -19,7 +19,7 @@ func TransactionBalance(c *fiber.Ctx, UserID string, WalletAddress string, Balan
 		Date:          time.Now(),
 	}
 
-	if err := Database.DB.Create(&TransactionBalance).Error; err != nil {
+	if err := database.DB.Create(&TransactionBalance).Error; err != nil {
 		return err
 	}
 

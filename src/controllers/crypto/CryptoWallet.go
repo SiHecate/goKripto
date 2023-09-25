@@ -1,13 +1,13 @@
 package controllers
 
 import (
-	"gokripto/Database"
 	model "gokripto/Model"
+	"gokripto/database"
 )
 
 func CryptoWallet(CryptoID uint, CryptoName string, CryptoPrice float64, Amount float64, WalletAddress string, ProcessType string) {
 	var existingCryptoWallet model.CryptoWallet
-	result := Database.DB.Where("wallet_address = ? AND crypto_name = ?", WalletAddress, CryptoName).First(&existingCryptoWallet)
+	result := database.DB.Where("wallet_address = ? AND crypto_name = ?", WalletAddress, CryptoName).First(&existingCryptoWallet)
 
 	// Calculate the total price of the crypto being bought or sold.
 	CryptoTotalPrice := CryptoPrice * Amount
@@ -26,18 +26,18 @@ func CryptoWallet(CryptoID uint, CryptoName string, CryptoPrice float64, Amount 
 		if result.Error == nil {
 			existingCryptoWallet.Amount += Amount
 			existingCryptoWallet.CryptoTotalPrice += CryptoTotalPrice
-			Database.DB.Save(&existingCryptoWallet)
+			database.DB.Save(&existingCryptoWallet)
 		} else {
-			Database.DB.Create(&newCryptoWallet)
+			database.DB.Create(&newCryptoWallet)
 		}
 	} else if ProcessType == "sell" {
 		// If the process type is "sell," update the existing crypto wallet entry or create a new one.
 		if result.Error == nil {
 			existingCryptoWallet.Amount -= Amount
 			existingCryptoWallet.CryptoTotalPrice -= CryptoTotalPrice
-			Database.DB.Save(&existingCryptoWallet)
+			database.DB.Save(&existingCryptoWallet)
 		} else {
-			Database.DB.Create(&newCryptoWallet)
+			database.DB.Create(&newCryptoWallet)
 		}
 	}
 }

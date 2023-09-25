@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"gokripto/Database"
 	model "gokripto/Model"
+	"gokripto/database"
 	"math/rand"
 	"time"
 
@@ -32,7 +32,7 @@ func Register(c *fiber.Ctx) error {
 		Password:      password,
 		WalletAddress: walletToken,
 	}
-	Database.DB.Create(&user)
+	database.DB.Create(&user)
 
 	// Retrieve the created user with wallet address.
 	createdUser := GetUserWalletAddress(walletToken)
@@ -47,7 +47,7 @@ func Register(c *fiber.Ctx) error {
 // GetUserWalletAddress retrieves a user by their wallet address.
 func GetUserWalletAddress(walletAddress string) model.User {
 	var user model.User
-	Database.DB.Where("wallet_address = ?", walletAddress).First(&user)
+	database.DB.Where("wallet_address = ?", walletAddress).First(&user)
 	return user
 }
 
@@ -58,7 +58,7 @@ func CreateWallet(user model.User) error {
 		UserID:        user.Id,
 		Balance:       0,
 	}
-	Database.DB.Create(&wallet)
+	database.DB.Create(&wallet)
 	return nil
 }
 

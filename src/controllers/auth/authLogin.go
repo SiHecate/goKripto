@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"gokripto/Database"
 	model "gokripto/Model"
+	"gokripto/database"
 	"strconv"
 	"time"
 
@@ -25,7 +25,7 @@ func Login(c *fiber.Ctx) error {
 	var user model.User
 
 	// Query the database to find the user by their email.
-	Database.DB.Where("email = ?", data["email"]).First(&user)
+	database.DB.Where("email = ?", data["email"]).First(&user)
 
 	// If no user is found, return a 404 response.
 	if user.Id == 0 {

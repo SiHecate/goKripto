@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"gokripto/Database"
 	model "gokripto/Model"
+	"gokripto/database"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,7 +18,7 @@ func TransactionListCrypto(c *fiber.Ctx) error {
 	}
 
 	var TransactionCryptos []model.TransactionCrypto
-	if err := Database.DB.Where("user_id = ?", issuer).Find(&TransactionCryptos).Error; err != nil {
+	if err := database.DB.Where("user_id = ?", issuer).Find(&TransactionCryptos).Error; err != nil {
 		return err
 	}
 

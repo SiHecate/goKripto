@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"gokripto/Database"
 	model "gokripto/Model"
+	"gokripto/database"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -48,13 +48,13 @@ func BuyCryptos(c *fiber.Ctx) error {
 
 	// Fetch the price of the selected cryptocurrency from the database.
 	var cryptoPrice float64
-	if err := Database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice).Error; err != nil {
+	if err := database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice).Error; err != nil {
 		return err
 	}
 
 	// Fetch the user's current balance from the wallet.
 	var userBalance float64
-	if err := Database.DB.Model(&model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &userBalance).Error; err != nil {
+	if err := database.DB.Model(&model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &userBalance).Error; err != nil {
 		return err
 	}
 
@@ -73,17 +73,17 @@ func BuyCryptos(c *fiber.Ctx) error {
 	}
 
 	// Update the user's wallet balance.
-	if err := Database.DB.Model(&model.Wallet{}).Where("user_id = ?", issuer).Update("balance", totalBalance).Error; err != nil {
+	if err := database.DB.Model(&model.Wallet{}).Where("user_id = ?", issuer).Update("balance", totalBalance).Error; err != nil {
 		return err
 	}
 
 	// Fetch the cryptocurrency's ID and user's wallet address.
 	var cryptoID uint
-	if err := Database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("id", &cryptoID).Error; err != nil {
+	if err := database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("id", &cryptoID).Error; err != nil {
 		return err
 	}
 	var WalletAddress string
-	if err := Database.DB.Model(&model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress).Error; err != nil {
+	if err := database.DB.Model(&model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress).Error; err != nil {
 		return err
 	}
 

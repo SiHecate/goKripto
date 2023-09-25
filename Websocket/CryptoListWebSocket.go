@@ -1,7 +1,7 @@
 package websocket
 
 import (
-	controllers "gokripto/controllers/CryptoController"
+	controllers "gokripto/src/controllers/crypto"
 	"log"
 	"time"
 
@@ -20,7 +20,7 @@ func StartWebSocket(app *fiber.App) {
 	app.Get("/ws/:id", websocket.New(func(ws *websocket.Conn) {
 		log.Printf("WebSocket port open on: %s", ws.Params("id"))
 		// Yenileme hızı
-		ticker := time.NewTicker(120 * time.Second)
+		ticker := time.NewTicker(5 * time.Second)
 		defer ticker.Stop()
 
 		// Websocket

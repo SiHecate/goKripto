@@ -1,6 +1,8 @@
-package Database
+package database
 
 import (
+	model "gokripto/Model"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -18,12 +20,14 @@ func dbConnect() {
 }
 
 func MigrateTables() {
-	migrateUser()
-	migrateCrypto()
-	migrateTransactionCrypto()
-	migrateTransactionBalance()
-	migrateWallet()
-	migrateCryptoWallet()
+	DB.AutoMigrate(
+		&model.User{},
+		&model.Crypto{},
+		&model.CryptoWallet{},
+		&model.Wallet{},
+		&model.TransactionBalance{},
+		&model.TransactionCrypto{},
+	)
 }
 
 func Connect() {

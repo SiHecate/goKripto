@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"gokripto/Database"
 	model "gokripto/Model"
+	"gokripto/database"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -20,7 +20,7 @@ func TransactionCryptos(c *fiber.Ctx, UserID string, WalletAddres string, price 
 	}
 
 	// Create crypto transaction database
-	if err := Database.DB.Create(&TransactionCryptos).Error; err != nil {
+	if err := database.DB.Create(&TransactionCryptos).Error; err != nil {
 		return err
 	}
 

@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"gokripto/Database"
 	model "gokripto/Model"
+	"gokripto/database"
 	"net/http"
 	"strconv"
 
@@ -71,7 +71,7 @@ func createOrUpdateCrypto(symbol string, name string, price string) error {
 	}
 
 	var crypto model.Crypto
-	result := Database.DB.Where("symbol = ?", symbol).First(&crypto)
+	result := database.DB.Where("symbol = ?", symbol).First(&crypto)
 	// This switch case detects database condition
 	switch {
 	case result.Error != nil:
@@ -81,7 +81,7 @@ func createOrUpdateCrypto(symbol string, name string, price string) error {
 			Name:   name,
 			Price:  priceFloat,
 		}
-		if err := Database.DB.Create(&crypto).Error; err != nil {
+		if err := database.DB.Create(&crypto).Error; err != nil {
 			return err
 		}
 	case result.Error != nil:
@@ -91,7 +91,7 @@ func createOrUpdateCrypto(symbol string, name string, price string) error {
 	default:
 		// Crypto price update
 		crypto.Price = priceFloat
-		Database.DB.Save(&crypto)
+		database.DB.Save(&crypto)
 	}
 
 	return nil
