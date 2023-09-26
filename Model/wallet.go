@@ -5,5 +5,5 @@ type Wallet struct {
 	WalletAddress string       `json:"wallet_address" gorm:"unique"`
 	UserID        uint         `json:"user_id"`
 	Balance       float64      `json:"balance"`
-	CryptoWallet  CryptoWallet ` gorm:"foreignKey:WalletAddress" json:"crypto_wallet,omitempty"`
+	CryptoWallet  CryptoWallet ` gorm:"foreignKey:WalletAddress" json:"crypto_wallet"`
 }

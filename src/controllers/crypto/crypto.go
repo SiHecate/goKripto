@@ -211,10 +211,11 @@ func AddBalanceCrypto(c *fiber.Ctx) error {
 
 	addBalance := data["addBalance"].(float64)
 
-	var WalletAddress string
-	if err := database.DB.Model(&model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress).Error; err != nil {
+	var user model.User
+	if err := database.DB.Where("id = ?", issuer).Preload("Wallet").First(&user).Error; err != nil {
 		return err
 	}
+	walletAddress := user.Wallet.WalletAddress
 
 	var availableBalance float64
 	if err := database.DB.Model(model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &availableBalance).Error; err != nil {
@@ -227,7 +228,7 @@ func AddBalanceCrypto(c *fiber.Ctx) error {
 		return err
 	}
 
-	TransactionBalance(c, issuer, WalletAddress, addBalance, "Deposit", "Balance Adding")
+	TransactionBalance(c, issuer, walletAddress, addBalance, "Deposit", "Balance Adding")
 	type addBalanceResponse struct {
 		Issuer           string  `json:"issuer"`
 		AvailableBalance float64 `json:"available_balance"`

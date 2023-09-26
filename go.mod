@@ -30,32 +30,9 @@ require (
 require (
 	github.com/gofiber/contrib/websocket v1.2.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/stretchr/testify v1.8.4
 )
 
 require (
-	github.com/cockroachdb/apd v1.1.0 // indirect
-	github.com/creasty/defaults v1.6.0 // indirect
-	github.com/go-pdf/fpdf v0.6.0 // indirect
-	github.com/go-playground/locales v0.14.0 // indirect
-	github.com/go-playground/universal-translator v0.18.0 // indirect
-	github.com/go-playground/validator/v10 v10.11.0 // indirect
-	github.com/leekchan/accounting v0.3.1 // indirect
-	github.com/leodido/go-urn v1.2.1 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
-	github.com/shopspring/decimal v1.3.1 // indirect
-)
-
-require (
-	github.com/angelodlfrtr/go-invoice-generator v0.6.0
-	github.com/boombuler/barcode v1.0.1 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/fasthttp/websocket v1.5.4 // indirect
-	github.com/johnfercher/maroto v1.0.0 // indirect
-	github.com/jung-kurt/gofpdf v1.16.2 // indirect
-	github.com/lib/pq v1.10.9
-	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245 // indirect
+	github.com/fasthttp/websocket v1.5.4
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
