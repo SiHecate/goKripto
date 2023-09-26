@@ -45,6 +45,9 @@ func Register(c *fiber.Ctx) error {
 	return c.JSON(user)
 }
 
+// Wallets.wallet_address'i walletAddress'e eşitlemek için
+// joins kullanıyoruz
+// JOIN wallets ON wallets.user_id = users.id
 func GetUserByWalletAddress(db *gorm.DB, walletAddress string) (*model.User, error) {
 	var user model.User
 	if err := db.Where("wallets.wallet_address = ?", walletAddress).
