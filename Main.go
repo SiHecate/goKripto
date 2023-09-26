@@ -1,9 +1,9 @@
 package main
 
 import (
-	websocket "gokripto/Websocket"
 	"gokripto/database"
 	routes "gokripto/routes"
+	websocket "gokripto/websocket"
 	"sync"
 
 	"github.com/gofiber/fiber/v2"

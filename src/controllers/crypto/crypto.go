@@ -135,10 +135,10 @@ func ListCryptoWallet(c *fiber.Ctx) error {
 		return err
 	}
 
-	var WalletAddress string
-	if err := database.DB.Model(&model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress).Error; err != nil {
-		return err
-	}
+	modelWallet := model.Wallet{}
+	database.DB.Debug().Where("user_id = ?", issuer).Find(&modelWallet)
+
+	WalletAddress := modelWallet.WalletAddress
 
 	var cryptoWallets []model.CryptoWallet
 	if err := database.DB.Model(&model.CryptoWallet{}).Where("wallet_address = ? AND amount > ? ", WalletAddress, 0).Find(&cryptoWallets).Error; err != nil {
@@ -169,10 +169,11 @@ func AccountBalance(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	var WalletAddress string
-	if err := database.DB.Model(model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress).Error; err != nil {
-		return err
-	}
+
+	modelWallet := model.Wallet{}
+	database.DB.Debug().Where("user_id = ?", issuer).Find(&modelWallet)
+
+	WalletAddress := modelWallet.WalletAddress
 
 	var wallet model.Wallet
 	if err := database.DB.Where("wallet_address = ?", WalletAddress).First(&wallet).Error; err != nil {
@@ -307,10 +308,11 @@ func BuyCryptos(c *fiber.Ctx) error {
 	if err := database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("id", &cryptoID).Error; err != nil {
 		return err
 	}
-	var WalletAddress string
-	if err := database.DB.Model(&model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress).Error; err != nil {
-		return err
-	}
+
+	modelWallet := model.Wallet{}
+	database.DB.Debug().Where("user_id = ?", issuer).Find(&modelWallet)
+
+	WalletAddress := modelWallet.WalletAddress
 
 	TransactionBalance(c, issuer, WalletAddress, totalCost, "Purchase", "Crypto Purchase")
 	TransactionCryptos(c, issuer, WalletAddress, cryptoPrice, cryptoName, amountToBuy, "Buy")
@@ -385,10 +387,11 @@ func SellCryptos(c *fiber.Ctx) error {
 	if err := database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("id", &cryptoID).Error; err != nil {
 		return err
 	}
-	var WalletAddress string
-	if err := database.DB.Model(&model.User{}).Where("id = ?", issuer).Pluck("wallet_address", &WalletAddress).Error; err != nil {
-		return err
-	}
+
+	modelWallet := model.Wallet{}
+	database.DB.Debug().Where("user_id = ?", issuer).Find(&modelWallet)
+
+	WalletAddress := modelWallet.WalletAddress
 
 	var cryptocurrency float64
 	database.DB.Model(&model.CryptoWallet{}).Where("wallet_address = ? AND crypto_name = ?", WalletAddress, cryptoName).Pluck("amount", &cryptocurrency)

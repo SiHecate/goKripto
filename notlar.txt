@@ -1,4 +1,5 @@
 Testleri testify'a update'le
+Fonksiyonları test ederek hataları çöz
 Swagger kullanmayı öğren frontend tarafına dökümantasyon vermek için
 Database fonksiyonlarına göz gezdir bulabildiklerini güncelle
 Util, middleware kavramlarını iyi araştırıp kodlarını bunlara göre ayır (clean code için)

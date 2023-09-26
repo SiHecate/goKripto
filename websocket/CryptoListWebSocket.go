@@ -19,9 +19,11 @@ func StartWebSocket(app *fiber.App) {
 
 	app.Get("/ws/:id", websocket.New(func(ws *websocket.Conn) {
 		log.Printf("WebSocket port open on: %s", ws.Params("id"))
+		// Yenileme hızı
 		ticker := time.NewTicker(5 * time.Second)
 		defer ticker.Stop()
 
+		// Websocket
 		for range ticker.C {
 			controllers.AddAllCryptoData(ws.Conn)
 		}

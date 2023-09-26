@@ -24,10 +24,13 @@ func MigrateTables() {
 		&model.User{},
 		&model.Crypto{},
 		&model.CryptoWallet{},
-		&model.Wallet{},
 		&model.TransactionBalance{},
 		&model.TransactionCrypto{},
 	)
+	DB.AutoMigrate(
+		&model.Wallet{},
+	)
+
 }
 
 func Connect() {

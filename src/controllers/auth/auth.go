@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 func Register(c *fiber.Ctx) error {
@@ -33,17 +34,25 @@ func Register(c *fiber.Ctx) error {
 	}
 	database.DB.Create(&user)
 
-	createdUser := GetUserWalletAddress(walletToken)
+	createdUser, err := GetUserByWalletAddress(database.DB, walletToken)
+	if err != nil {
+		// Handle the error here
+		return err
+	}
 
-	CreateWallet(createdUser)
+	CreateWallet(*createdUser)
 
 	return c.JSON(user)
 }
 
-func GetUserWalletAddress(walletAddress string) model.User {
+func GetUserByWalletAddress(db *gorm.DB, walletAddress string) (*model.User, error) {
 	var user model.User
-	database.DB.Where("wallet_address = ?", walletAddress).First(&user)
-	return user
+	if err := db.Where("wallets.wallet_address = ?", walletAddress).
+		Joins("JOIN wallets ON wallets.user_id = users.id").
+		First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
 
 func CreateWallet(user model.User) error {
