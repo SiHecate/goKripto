@@ -5,11 +5,11 @@ import (
 )
 
 type TransactionBalance struct {
-	ID            uint      `json:"transactionID" gorm:"unique"`
-	UserID        string    `json:"userID"`
-	WalletAddress string    `json:"walletAddress"`
-	BalanceAmount float64   `json:"balanceAmount"`
+	ID            uint      `json:"id" gorm:"unique"`
+	UserID        string    `json:"user_id"`
+	WalletAddress string    `json:"wallet_address"`
+	BalanceAmount float64   `json:"balance_amount"`
 	Type          string    `json:"type"`
-	TypeInfo      string    `json:"typeInfo"`
+	TypeInfo      string    `json:"type_info"`
 	Date          time.Time `json:"date"`
 }

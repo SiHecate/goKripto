@@ -25,7 +25,6 @@ services:
     command: air ./main.go -b 0.0.0.0 
     volumes:
       - ./:/app
-      - ./Pdfs:/home/umut/goKripto/Pdfs
 
 volumes:
   postgres-db:

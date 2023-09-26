@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"fmt"
-	"gokripto/Database"
 	model "gokripto/Model"
+	"gokripto/database"
 	"log"
 	"os"
 	"time"
@@ -16,12 +16,12 @@ import (
 func BillGenerator(UserID string, price float64, cryptoname string, amount float64, transactionType string) {
 	directoryFileTime := time.Now()
 	var directoryUserName string
-	if err := Database.DB.Model(&model.User{}).Where("id", UserID).Pluck("name", &directoryUserName).Error; err != nil {
+	if err := database.DB.Model(&model.User{}).Where("id", UserID).Pluck("name", &directoryUserName).Error; err != nil {
 		log.Fatal(err)
 	}
 
 	var walletAddress string
-	if err := Database.DB.Model(&model.User{}).Where("id", UserID).Pluck("wallet_address", &walletAddress).Error; err != nil {
+	if err := database.DB.Model(&model.User{}).Where("id", UserID).Pluck("wallet_address", &walletAddress).Error; err != nil {
 		log.Fatal(err)
 	}
 

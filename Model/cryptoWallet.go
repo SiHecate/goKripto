@@ -1,10 +1,9 @@
 package model
 
 type CryptoWallet struct {
-	ID               uint    `json:"cryptoWalletID" gorm:"unique"`
-	WalletAddress    string  `json:"walletAddress"`
-	CryptoID         uint    `json:"cryptoID"`
-	CryptoName       string  `json:"cryptoName"`
-	CryptoTotalPrice float64 `json:"cryptoTotalPrice"`
-	Amount           float64 `json:"cryptoAmount"`
+	ID               uint    `json:"id" gorm:"primaryKey"`
+	WalletAddress    string  `json:"wallet_address"`
+	CryptoName       string  `json:"crypto_name"`
+	CryptoTotalPrice float64 `json:"crypto_total_price"`
+	Amount           float64 `json:"crypto_amount"`
 }

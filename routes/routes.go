@@ -1,8 +1,10 @@
 package routes
 
 import (
-	AuthController "gokripto/controllers/AuthController"
-	CryptoControllers "gokripto/controllers/CryptoController"
+	AuthController "gokripto/src/controllers/auth"
+	CryptoControllers "gokripto/src/controllers/crypto"
+	Middleware "gokripto/src/middlewares"
+
 	"log"
 	"time"
 
@@ -41,18 +43,18 @@ func Setup(app *fiber.App) {
 	}
 
 	// Post
-	app.Post("/api/register", timeoutHandler, AuthController.Register)              // Done
-	app.Post("/api/login", timeoutHandler, AuthController.Login)                    // Done
-	app.Post("/api/logout", timeoutHandler, AuthController.Logout)                  // Done
-	app.Post("/api/cryptoBuy", timeoutHandler, CryptoControllers.BuyCryptos)        // Done
-	app.Post("/api/cryptoSell", timeoutHandler, CryptoControllers.SellCryptos)      // Done
-	app.Post("/api/addBalance", timeoutHandler, CryptoControllers.AddBalanceCrypto) // Done
+	app.Post("/api/register", timeoutHandler, AuthController.Register)                                    // Done
+	app.Post("/api/login", timeoutHandler, AuthController.Login)                                          // Done
+	app.Post("/api/logout", timeoutHandler, AuthController.Logout)                                        // Done
+	app.Post("/api/cryptoBuy", Middleware.GetIssuer, timeoutHandler, CryptoControllers.BuyCryptos)        // Done
+	app.Post("/api/cryptoSell", Middleware.GetIssuer, timeoutHandler, CryptoControllers.SellCryptos)      // Done
+	app.Post("/api/addBalance", Middleware.GetIssuer, timeoutHandler, CryptoControllers.AddBalanceCrypto) // Done
 
 	// Get
-	app.Get("/api/CryptoTransactionHistory", timeoutHandler, CryptoControllers.TransactionListCrypto)   // Done
-	app.Get("/api/BalanceTransactionHistory", timeoutHandler, CryptoControllers.TransactionListBalance) // Done
-	app.Get("/api/user", timeoutHandler, AuthController.User)                                           // Done
-	app.Get("/api/balance", timeoutHandler, CryptoControllers.AccountBalance)                           // Done
-	app.Get("/api/cryptoList", timeoutHandler, CryptoControllers.ListAllCryptos)                        // Done
-	app.Get("/api/listcryptowallet", timeoutHandler, CryptoControllers.ListCryptoWallet)                // Done
+	app.Get("/api/CryptoTransactionHistory", Middleware.GetIssuer, timeoutHandler, CryptoControllers.TransactionListCrypto)   // Done
+	app.Get("/api/BalanceTransactionHistory", Middleware.GetIssuer, timeoutHandler, CryptoControllers.TransactionListBalance) // Done
+	app.Get("/api/user", timeoutHandler, AuthController.User)                                                                 // Done
+	app.Get("/api/balance", Middleware.GetIssuer, timeoutHandler, CryptoControllers.AccountBalance)                           // Done
+	app.Get("/api/cryptoList", timeoutHandler, CryptoControllers.ListAllCryptos)                                              // Done
+	app.Get("/api/listcryptowallet", Middleware.GetIssuer, timeoutHandler, CryptoControllers.ListCryptoWallet)                // Done
 }

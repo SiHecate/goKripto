@@ -1,6 +1,8 @@
-package Database
+package database
 
 import (
+	model "gokripto/Model"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -13,17 +15,19 @@ func dbConnect() {
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic("Veritabanına bağlanırken bir hata oluştu: " + err.Error())
+		panic("Database error: " + err.Error())
 	}
 }
 
 func MigrateTables() {
-	migrateUser()
-	migrateCrypto()
-	migrateTransactionCrypto()
-	migrateTransactionBalance()
-	migrateWallet()
-	migrateCryptoWallet()
+	DB.AutoMigrate(
+		&model.User{},
+		&model.Crypto{},
+		&model.CryptoWallet{},
+		&model.Wallet{},
+		&model.TransactionBalance{},
+		&model.TransactionCrypto{},
+	)
 }
 
 func Connect() {
