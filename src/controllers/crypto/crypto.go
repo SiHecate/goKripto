@@ -135,11 +135,10 @@ func ListCryptoWallet(c *fiber.Ctx) error {
 		return err
 	}
 
-	modelWallet := model.Wallet{}
-	database.DB.Debug().Where("user_id = ?", issuer).Find(&modelWallet)
-
-	WalletAddress := modelWallet.WalletAddress
-
+	WalletAddress, err := helpers.GetWalletAddress(issuer)
+	if err != nil {
+		return err
+	}
 	var cryptoWallets []model.CryptoWallet
 	if err := database.DB.Model(&model.CryptoWallet{}).Where("wallet_address = ? AND amount > ? ", WalletAddress, 0).Find(&cryptoWallets).Error; err != nil {
 		return err
@@ -170,10 +169,10 @@ func AccountBalance(c *fiber.Ctx) error {
 		return err
 	}
 
-	modelWallet := model.Wallet{}
-	database.DB.Debug().Where("user_id = ?", issuer).Find(&modelWallet)
-
-	WalletAddress := modelWallet.WalletAddress
+	WalletAddress, err := helpers.GetWalletAddress(issuer)
+	if err != nil {
+		return err
+	}
 
 	var wallet model.Wallet
 	if err := database.DB.Where("wallet_address = ?", WalletAddress).First(&wallet).Error; err != nil {
@@ -212,11 +211,10 @@ func AddBalanceCrypto(c *fiber.Ctx) error {
 
 	addBalance := data["addBalance"].(float64)
 
-	var user model.User
-	if err := database.DB.Where("id = ?", issuer).Preload("Wallet").First(&user).Error; err != nil {
+	WalletAddress, err := helpers.GetWalletAddress(issuer)
+	if err != nil {
 		return err
 	}
-	walletAddress := user.Wallet.WalletAddress
 
 	var availableBalance float64
 	if err := database.DB.Model(model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &availableBalance).Error; err != nil {
@@ -229,7 +227,7 @@ func AddBalanceCrypto(c *fiber.Ctx) error {
 		return err
 	}
 
-	TransactionBalance(c, issuer, walletAddress, addBalance, "Deposit", "Balance Adding")
+	TransactionBalance(c, issuer, WalletAddress, addBalance, "Deposit", "Balance Adding")
 	type addBalanceResponse struct {
 		Issuer           string  `json:"issuer"`
 		AvailableBalance float64 `json:"available_balance"`
