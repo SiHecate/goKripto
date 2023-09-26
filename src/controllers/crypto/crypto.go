@@ -230,8 +230,8 @@ func AddBalanceCrypto(c *fiber.Ctx) error {
 	TransactionBalance(c, issuer, WalletAddress, addBalance, "Deposit", "Balance Adding")
 	type addBalanceResponse struct {
 		Issuer           string  `json:"issuer"`
-		AvailableBalance float64 `json:"availableBalance"`
-		TotalBalance     float64 `json:"addedBalance"`
+		AvailableBalance float64 `json:"available_balance"`
+		TotalBalance     float64 `json:"added_balance"`
 	}
 
 	response := addBalanceResponse{
