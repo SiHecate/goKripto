@@ -22,15 +22,22 @@ func dbConnect() {
 func MigrateTables() {
 	DB.AutoMigrate(
 		&model.User{},
-		&model.Crypto{},
+		&model.Wallet{},
 		&model.CryptoWallet{},
+		&model.Crypto{},
 		&model.TransactionBalance{},
 		&model.TransactionCrypto{},
 	)
-	DB.AutoMigrate(
-		&model.Wallet{},
-	)
 
+}
+
+func DownTables() {
+	DB.Migrator().DropTable(&model.User{})
+	DB.Migrator().DropTable(&model.Wallet{})
+	DB.Migrator().DropTable(&model.Crypto{})
+	DB.Migrator().DropTable(&model.TransactionBalance{})
+	DB.Migrator().DropTable(&model.TransactionCrypto{})
+	DB.Migrator().DropTable(&model.CryptoWallet{})
 }
 
 func Connect() {

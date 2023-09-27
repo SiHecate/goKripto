@@ -44,11 +44,11 @@ func Setup(app *fiber.App) {
 
 	// Post
 	app.Post("/api/register", timeoutHandler, AuthController.Register)                                    // Done
-	app.Post("/api/login", timeoutHandler, AuthController.Login)                                          // Done
+	app.Post("/api/login", timeoutHandler, AuthController.Login)                                          // Updatable
 	app.Post("/api/logout", timeoutHandler, AuthController.Logout)                                        // Done
 	app.Post("/api/cryptoBuy", Middleware.GetIssuer, timeoutHandler, CryptoControllers.BuyCryptos)        // Done
 	app.Post("/api/cryptoSell", Middleware.GetIssuer, timeoutHandler, CryptoControllers.SellCryptos)      // Done
-	app.Post("/api/addBalance", Middleware.GetIssuer, timeoutHandler, CryptoControllers.AddBalanceCrypto) // Done
+	app.Post("/api/addBalance", Middleware.GetIssuer, timeoutHandler, CryptoControllers.AddBalanceCrypto) // Updatable
 
 	// Get
 	app.Get("/api/CryptoTransactionHistory", Middleware.GetIssuer, timeoutHandler, CryptoControllers.TransactionListCrypto)   // Done

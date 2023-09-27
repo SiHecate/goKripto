@@ -3,7 +3,7 @@ package main
 import (
 	"gokripto/database"
 	routes "gokripto/routes"
-	websocket "gokripto/websocket"
+	websocket "gokripto/src/controllers"
 	"sync"
 
 	"github.com/gofiber/fiber/v2"

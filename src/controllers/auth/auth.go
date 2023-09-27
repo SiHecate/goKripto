@@ -3,6 +3,7 @@ package controllers
 import (
 	model "gokripto/Model"
 	"gokripto/database"
+	helper "gokripto/src/helpers"
 	"math/rand"
 	"strconv"
 	"time"
@@ -64,8 +65,8 @@ func CreateWallet(user model.User) error {
 		UserID:        user.ID,
 		Balance:       0,
 	}
-	database.DB.Create(&wallet)
-	return nil
+	return database.DB.Create(&wallet).Error
+
 }
 
 func generateWalletToken() string {
@@ -176,10 +177,15 @@ func User(c *fiber.Ctx) error {
 		WalletBalance float64
 	}
 
+	walletAddress, err := helper.GetWalletAddress(claims.Issuer)
+	if err != nil {
+		return err
+	}
+
 	response := UserResponse{
 		Name:          user.Name,
 		Email:         user.Email,
-		WalletAddress: user.Wallet.WalletAddress,
+		WalletAddress: walletAddress,
 		WalletBalance: user.Wallet.Balance,
 	}
 	return c.JSON(response)

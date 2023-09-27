@@ -2,15 +2,18 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	model "gokripto/Model"
 	"gokripto/database"
 	helpers "gokripto/src/helpers"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/fasthttp/websocket"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 func AddAllCryptoData(ws *websocket.Conn) error {
@@ -140,7 +143,8 @@ func ListCryptoWallet(c *fiber.Ctx) error {
 		return err
 	}
 	var cryptoWallets []model.CryptoWallet
-	if err := database.DB.Model(&model.CryptoWallet{}).Where("wallet_address = ? AND amount > ? ", WalletAddress, 0).Find(&cryptoWallets).Error; err != nil {
+	if err := database.DB.Model(&model.CryptoWallet{}).Where("CAST(wallet_address AS TEXT) = ? AND amount > ? ", WalletAddress, 0).Find(&cryptoWallets).Error; err != nil {
+		log.Printf("Error while querying CryptoWallets: %s", err.Error())
 		return err
 	}
 
@@ -280,6 +284,7 @@ func BuyCryptos(c *fiber.Ctx) error {
 	if err := database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice).Error; err != nil {
 		return err
 	}
+	fmt.Printf("Kullanıcı Kimliği (User ID): '%s'\n", issuer)
 
 	var userBalance float64
 	if err := database.DB.Model(&model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &userBalance).Error; err != nil {
@@ -310,11 +315,14 @@ func BuyCryptos(c *fiber.Ctx) error {
 	modelWallet := model.Wallet{}
 	database.DB.Debug().Where("user_id = ?", issuer).Find(&modelWallet)
 
-	WalletAddress := modelWallet.WalletAddress
+	WalletAddress, err := helpers.GetWalletAddress(issuer)
+	if err != nil {
+		return err
+	}
 
+	CryptoWallet(issuer, cryptoName, cryptoPrice, amountToBuy, "buy")
 	TransactionBalance(c, issuer, WalletAddress, totalCost, "Purchase", "Crypto Purchase")
 	TransactionCryptos(c, issuer, WalletAddress, cryptoPrice, cryptoName, amountToBuy, "Buy")
-	CryptoWallet(cryptoID, cryptoName, cryptoPrice, amountToBuy, WalletAddress, "buy")
 
 	type BuyCryptoResponse struct {
 		TotalCost     float64 `json:"totalCost"`
@@ -387,9 +395,12 @@ func SellCryptos(c *fiber.Ctx) error {
 	}
 
 	modelWallet := model.Wallet{}
-	database.DB.Debug().Where("user_id = ?", issuer).Find(&modelWallet)
+	database.DB.Where("user_id = ?", issuer).Find(&modelWallet)
 
-	WalletAddress := modelWallet.WalletAddress
+	WalletAddress, err := helpers.GetWalletAddress(issuer)
+	if err != nil {
+		return err
+	}
 
 	var cryptocurrency float64
 	database.DB.Model(&model.CryptoWallet{}).Where("wallet_address = ? AND crypto_name = ?", WalletAddress, cryptoName).Pluck("amount", &cryptocurrency)
@@ -399,9 +410,9 @@ func SellCryptos(c *fiber.Ctx) error {
 		})
 	}
 
+	CryptoWallet(issuer, cryptoName, cryptoPrice, amountToSell, "sell")
 	TransactionBalance(c, issuer, WalletAddress, totalProfit, "Sales", "Crypto Sales")
 	TransactionCryptos(c, issuer, WalletAddress, cryptoPrice, cryptoName, amountToSell, "Sell")
-	CryptoWallet(cryptoID, cryptoName, cryptoPrice, amountToSell, WalletAddress, "sell")
 
 	type SellCryptoResponse struct {
 		TotalProfit      float64 `json:"totalProfit"`
@@ -494,14 +505,25 @@ func TransactionListCrypto(c *fiber.Ctx) error {
 	return c.JSON(TransactionCryptos)
 }
 
-func CryptoWallet(CryptoID uint, CryptoName string, CryptoPrice float64, Amount float64, WalletAddress string, ProcessType string) {
+func CryptoWallet(User string, CryptoName string, CryptoPrice float64, Amount float64, ProcessType string) error {
 	var existingCryptoWallet model.CryptoWallet
-	result := database.DB.Where("wallet_address = ? AND crypto_name = ?", WalletAddress, CryptoName).First(&existingCryptoWallet)
+	WalletAddress, err := helpers.GetWalletAddress(User)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return err
+	}
+
+	UserInt, err := strconv.Atoi(User)
+
+	result := database.DB.Preload("Wallet", func(tx *gorm.DB) *gorm.DB {
+		return tx.Where("wallet_address = ?", WalletAddress)
+	}).Where("crypto_name = ?", CryptoName).First(&existingCryptoWallet)
 
 	CryptoTotalPrice := CryptoPrice * Amount
+	fmt.Println(CryptoName, CryptoPrice, Amount, ProcessType)
 
 	newCryptoWallet := model.CryptoWallet{
-		WalletAddress:    WalletAddress,
+		WalletID:         UserInt,
 		CryptoName:       CryptoName,
 		CryptoTotalPrice: CryptoTotalPrice,
 		Amount:           Amount,
@@ -524,4 +546,6 @@ func CryptoWallet(CryptoID uint, CryptoName string, CryptoPrice float64, Amount 
 			database.DB.Create(&newCryptoWallet)
 		}
 	}
+
+	return nil
 }
