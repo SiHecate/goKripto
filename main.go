@@ -12,7 +12,9 @@ import (
 
 func main() {
 	database.Connect()
-	database.DownTables()
+
+	//database.DownTables()
+
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
 		AllowCredentials: true,

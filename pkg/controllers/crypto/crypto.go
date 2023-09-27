@@ -6,7 +6,6 @@ import (
 	model "gokripto/Model"
 	"gokripto/database"
 	helpers "gokripto/pkg/helpers"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -521,16 +520,9 @@ func ListCryptoWallet(c *fiber.Ctx) error {
 		return err
 	}
 
-	WalletAddress, err := helpers.GetWalletAddress(issuer)
-	if err != nil {
-		return err
-	}
-
 	var cryptoWallets []model.CryptoWallet
-	if err := database.DB.Model(&model.CryptoWallet{}).Where("CAST(wallet_address AS TEXT) = ? AND amount > ? ", WalletAddress, 0).Find(&cryptoWallets).Error; err != nil {
-		log.Printf("Error while querying CryptoWallets: %s", err.Error())
-		return err
-	}
+
+	database.DB.Preload("Wallet").Where("wallet_id = ?", issuer).Find(&cryptoWallets)
 
 	type WalletListResponse struct {
 		WalletAddress    string  `json:"wallet_address"`
@@ -539,6 +531,10 @@ func ListCryptoWallet(c *fiber.Ctx) error {
 		CryptoTotalPrice float64 `json:"crypto_total_price"`
 	}
 
+	WalletAddress, err := helpers.GetWalletAddress(issuer)
+	if err != nil {
+		return err
+	}
 	var response []WalletListResponse
 	for _, cryptoWallet := range cryptoWallets {
 		response = append(response, WalletListResponse{
