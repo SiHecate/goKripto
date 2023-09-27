@@ -3,7 +3,7 @@ package controllers
 import (
 	model "gokripto/Model"
 	"gokripto/database"
-	helper "gokripto/src/helpers"
+	helper "gokripto/pkg/helpers"
 	"math/rand"
 	"strconv"
 	"time"

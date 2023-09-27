@@ -5,7 +5,7 @@ import (
 	"fmt"
 	model "gokripto/Model"
 	"gokripto/database"
-	helpers "gokripto/src/helpers"
+	helpers "gokripto/pkg/helpers"
 	"log"
 	"net/http"
 	"strconv"
@@ -127,41 +127,6 @@ func ListAllCryptos(c *fiber.Ctx) error {
 			Symbol: crypto.Symbol,
 			Name:   crypto.Name,
 			Price:  crypto.Price,
-		})
-	}
-	return c.JSON(response)
-}
-
-func ListCryptoWallet(c *fiber.Ctx) error {
-	issuer, err := helpers.GetIssuerFromContext(c)
-	if err != nil {
-		return err
-	}
-
-	WalletAddress, err := helpers.GetWalletAddress(issuer)
-	if err != nil {
-		return err
-	}
-	var cryptoWallets []model.CryptoWallet
-	if err := database.DB.Model(&model.CryptoWallet{}).Where("CAST(wallet_address AS TEXT) = ? AND amount > ? ", WalletAddress, 0).Find(&cryptoWallets).Error; err != nil {
-		log.Printf("Error while querying CryptoWallets: %s", err.Error())
-		return err
-	}
-
-	type WalletListResponse struct {
-		WalletAddress    string  `json:"wallet_address"`
-		CryptoName       string  `json:"crypto_name"`
-		Amount           float64 `json:"amount"`
-		CryptoTotalPrice float64 `json:"crypto_total_price"`
-	}
-
-	var response []WalletListResponse
-	for _, cryptoWallet := range cryptoWallets {
-		response = append(response, WalletListResponse{
-			WalletAddress:    WalletAddress,
-			CryptoName:       cryptoWallet.CryptoName,
-			Amount:           cryptoWallet.Amount,
-			CryptoTotalPrice: cryptoWallet.CryptoTotalPrice,
 		})
 	}
 	return c.JSON(response)
@@ -548,4 +513,40 @@ func CryptoWallet(User string, CryptoName string, CryptoPrice float64, Amount fl
 	}
 
 	return nil
+}
+
+func ListCryptoWallet(c *fiber.Ctx) error {
+	issuer, err := helpers.GetIssuerFromContext(c)
+	if err != nil {
+		return err
+	}
+
+	WalletAddress, err := helpers.GetWalletAddress(issuer)
+	if err != nil {
+		return err
+	}
+
+	var cryptoWallets []model.CryptoWallet
+	if err := database.DB.Model(&model.CryptoWallet{}).Where("CAST(wallet_address AS TEXT) = ? AND amount > ? ", WalletAddress, 0).Find(&cryptoWallets).Error; err != nil {
+		log.Printf("Error while querying CryptoWallets: %s", err.Error())
+		return err
+	}
+
+	type WalletListResponse struct {
+		WalletAddress    string  `json:"wallet_address"`
+		CryptoName       string  `json:"crypto_name"`
+		Amount           float64 `json:"amount"`
+		CryptoTotalPrice float64 `json:"crypto_total_price"`
+	}
+
+	var response []WalletListResponse
+	for _, cryptoWallet := range cryptoWallets {
+		response = append(response, WalletListResponse{
+			WalletAddress:    WalletAddress,
+			CryptoName:       cryptoWallet.CryptoName,
+			Amount:           cryptoWallet.Amount,
+			CryptoTotalPrice: cryptoWallet.CryptoTotalPrice,
+		})
+	}
+	return c.JSON(response)
 }

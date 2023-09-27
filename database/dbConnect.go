@@ -9,7 +9,12 @@ import (
 
 var DB *gorm.DB
 
-func dbConnect() {
+func Connect() {
+	DBConnection()
+	MigrateTables()
+}
+
+func DBConnection() {
 	dsn := "host=postgres user=postgres password=393406 dbname=kriptoDB port=5432 sslmode=disable TimeZone=Europe/Istanbul"
 
 	var err error
@@ -32,15 +37,12 @@ func MigrateTables() {
 }
 
 func DownTables() {
-	DB.Migrator().DropTable(&model.User{})
-	DB.Migrator().DropTable(&model.Wallet{})
-	DB.Migrator().DropTable(&model.Crypto{})
-	DB.Migrator().DropTable(&model.TransactionBalance{})
-	DB.Migrator().DropTable(&model.TransactionCrypto{})
-	DB.Migrator().DropTable(&model.CryptoWallet{})
-}
-
-func Connect() {
-	dbConnect()
-	MigrateTables()
+	DB.Migrator().DropTable(
+		&model.User{},
+		&model.Wallet{},
+		&model.CryptoWallet{},
+		&model.Crypto{},
+		&model.TransactionBalance{},
+		&model.TransactionCrypto{},
+	)
 }

@@ -2,8 +2,8 @@ package main
 
 import (
 	"gokripto/database"
+	websocket "gokripto/pkg/controllers"
 	routes "gokripto/routes"
-	websocket "gokripto/src/controllers"
 	"sync"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,6 +12,7 @@ import (
 
 func main() {
 	database.Connect()
+	database.DownTables()
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
 		AllowCredentials: true,
