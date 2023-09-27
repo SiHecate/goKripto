@@ -248,7 +248,6 @@ func BuyCryptos(c *fiber.Ctx) error {
 	if err := database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice).Error; err != nil {
 		return err
 	}
-	fmt.Printf("Kullanıcı Kimliği (User ID): '%s'\n", issuer)
 
 	var userBalance float64
 	if err := database.DB.Model(&model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &userBalance).Error; err != nil {
@@ -277,7 +276,7 @@ func BuyCryptos(c *fiber.Ctx) error {
 	}
 
 	modelWallet := model.Wallet{}
-	database.DB.Debug().Where("user_id = ?", issuer).Find(&modelWallet)
+	database.DB.Where("user_id = ?", issuer).Find(&modelWallet)
 
 	WalletAddress, err := helpers.GetWalletAddress(issuer)
 	if err != nil {
@@ -289,12 +288,12 @@ func BuyCryptos(c *fiber.Ctx) error {
 	TransactionCryptos(c, issuer, WalletAddress, cryptoPrice, cryptoName, amountToBuy, "Buy")
 
 	type BuyCryptoResponse struct {
-		TotalCost     float64 `json:"totalCost"`
-		CryptoName    string  `json:"cryptoName"`
-		AmountToBuy   float64 `json:"amountToBuy"`
+		TotalCost     float64 `json:"total_cost"`
+		CryptoName    string  `json:"crypto_name"`
+		AmountToBuy   float64 `json:"amount_to_buy"`
 		Issuer        string  `json:"issuer"`
-		UserBalance   float64 `json:"userBalance"`
-		UserBalanceAB float64 `json:"newUserBalance"`
+		UserBalance   float64 `json:"user_balance"`
+		UserBalanceAB float64 `json:"user_balance_after_buy"`
 	}
 
 	response := BuyCryptoResponse{
@@ -366,27 +365,17 @@ func SellCryptos(c *fiber.Ctx) error {
 		return err
 	}
 
-	var cryptocurrency float64
-	database.DB.Model(&model.CryptoWallet{}).Where("wallet_address = ? AND crypto_name = ?", WalletAddress, cryptoName).Pluck("amount", &cryptocurrency)
-	if cryptocurrency < 0 {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "invalid number",
-		})
-	}
-
 	CryptoWallet(issuer, cryptoName, cryptoPrice, amountToSell, "sell")
 	TransactionBalance(c, issuer, WalletAddress, totalProfit, "Sales", "Crypto Sales")
 	TransactionCryptos(c, issuer, WalletAddress, cryptoPrice, cryptoName, amountToSell, "Sell")
 
 	type SellCryptoResponse struct {
-		TotalProfit      float64 `json:"totalProfit"`
-		CryptoName       string  `json:"cryptoName"`
-		AmountToSell     float64 `json:"amountToSell"`
+		TotalProfit      float64 `json:"total_profit"`
+		CryptoName       string  `json:"crypto_name"`
+		AmountToSell     float64 `json:"amount_to_sell"`
 		Issuer           string  `json:"issuer"`
-		UserBalance      float64 `json:"userBalance"`
-		UserBalanceAfter float64 `json:"userBalanceAB"`
-		CryptoID         uint    `json:"cryptoID"`
-		Currency         float64
+		UserBalance      float64 `json:"user_balance"`
+		UserBalanceAfter float64 `json:"user_balance_after_sell"`
 	}
 
 	response := SellCryptoResponse{
@@ -396,7 +385,6 @@ func SellCryptos(c *fiber.Ctx) error {
 		Issuer:           issuer,
 		UserBalance:      userBalance,
 		UserBalanceAfter: totalBalance,
-		Currency:         cryptocurrency,
 	}
 
 	return c.Status(200).JSON(response)
@@ -484,7 +472,6 @@ func CryptoWallet(User string, CryptoName string, CryptoPrice float64, Amount fl
 	}).Where("crypto_name = ?", CryptoName).First(&existingCryptoWallet)
 
 	CryptoTotalPrice := CryptoPrice * Amount
-	fmt.Println(CryptoName, CryptoPrice, Amount, ProcessType)
 
 	newCryptoWallet := model.CryptoWallet{
 		WalletID:         UserInt,
