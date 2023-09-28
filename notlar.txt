@@ -17,3 +17,8 @@ func GetUserByWalletAddress(db *gorm.DB, walletAddress string) (*model.User, err
 https://github.com/golang-standards/project-layout
 https://github.com/yakuter
 https://github.com/yakuter/go-clean-code
+
+
+unit testing guide
+
+https://medium.com/trendyol-tech/golang-blazing-fast-unit-tests-fiber-fasthttp-http-internals-and-optimizing-http-server-tests-bbd1fe7b944b
