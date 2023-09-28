@@ -8,8 +8,10 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/stretchr/testify/assert"
 )
 
+// Done Post
 func TestLogin(t *testing.T) {
 	type wanted struct {
 		StatusCode   int
@@ -99,9 +101,7 @@ func TestLogin(t *testing.T) {
 			}
 			defer resp.Body.Close()
 
-			if resp.StatusCode != test.expected.StatusCode {
-				t.Errorf("Expected status code %d, but got %d", test.expected.StatusCode, resp.StatusCode)
-			}
+			assert.Equal(t, test.expected.StatusCode, resp.StatusCode)
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -114,14 +114,13 @@ func TestLogin(t *testing.T) {
 			}
 
 			for _, key := range test.expected.expectedKeys {
-				if _, ok := response[key]; !ok {
-					t.Errorf("Expected JSON key '%s' not found in the response", key)
-				}
+				assert.Contains(t, response, key, "Expected JSON key '%s' not found in the response", key)
 			}
 		})
 	}
 }
 
+// Done Post
 func BenchmarkLogin(b *testing.B) {
 	type wanted struct {
 		StatusCode   int
@@ -211,9 +210,7 @@ func BenchmarkLogin(b *testing.B) {
 			}
 			defer resp.Body.Close()
 
-			if resp.StatusCode != benchmark.expected.StatusCode {
-				b.Errorf("Expected status code %d, but got %d", benchmark.expected.StatusCode, resp.StatusCode)
-			}
+			assert.Equal(b, benchmark.expected.StatusCode, resp.StatusCode)
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -226,14 +223,13 @@ func BenchmarkLogin(b *testing.B) {
 			}
 
 			for _, key := range benchmark.expected.expectedKeys {
-				if _, ok := response[key]; !ok {
-					b.Errorf("Expected JSON key '%s' not found in the response", key)
-				}
+				assert.Contains(b, response, key, "Expected JSON key '%s' not found in the response", key)
 			}
 		})
 	}
 }
 
+// Done Post
 func TestLogout(t *testing.T) {
 	type wanted struct {
 		StatusCode   int
@@ -313,9 +309,7 @@ func TestLogout(t *testing.T) {
 			}
 			defer resp.Body.Close()
 
-			if resp.StatusCode != test.expected.StatusCode {
-				t.Errorf("Expected status code %d, but got %d", test.expected.StatusCode, resp.StatusCode)
-			}
+			assert.Equal(t, test.expected.StatusCode, resp.StatusCode)
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -328,14 +322,13 @@ func TestLogout(t *testing.T) {
 			}
 
 			for _, key := range test.expected.expectedKeys {
-				if _, ok := response[key]; !ok {
-					t.Errorf("Expected JSON key '%s' not found in the response", key)
-				}
+				assert.Contains(t, response, key, "Expected JSON key '%s' not found in the response", key)
 			}
 		})
 	}
 }
 
+// Done Post
 func BenchmarkLogout(b *testing.B) {
 	type wanted struct {
 		StatusCode   int
@@ -415,9 +408,7 @@ func BenchmarkLogout(b *testing.B) {
 			}
 			defer resp.Body.Close()
 
-			if resp.StatusCode != benchmark.expected.StatusCode {
-				b.Errorf("Expected status code %d, but got %d", benchmark.expected.StatusCode, resp.StatusCode)
-			}
+			assert.Equal(b, benchmark.expected.StatusCode, resp.StatusCode)
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -430,23 +421,22 @@ func BenchmarkLogout(b *testing.B) {
 			}
 
 			for _, key := range benchmark.expected.expectedKeys {
-				if _, ok := response[key]; !ok {
-					b.Errorf("Expected JSON key '%s' not found in the response", key)
-				}
+				assert.Contains(b, response, key, "Expected JSON key '%s' not found in the response", key)
 			}
 		})
 	}
 }
 
+// Done Get
 func TestUser(t *testing.T) {
 	app := fiber.New()
 
 	app.Get("/user", func(c *fiber.Ctx) error {
 		response := map[string]interface{}{
-			"userID":        2,
-			"username":      "umut",
-			"email":         "umut@admin.com",
-			"walletAddress": "%TE4i760HX6SNt5bMVURZ4dFR+%@@7w",
+			"Name":          2,
+			"Email":         "umut",
+			"WalletAddress": "TE4i760HX6SNt5bMVURZ4dFR+%@@7w",
+			"WalletBalance": "2333303.1321",
 		}
 
 		return c.JSON(response)
@@ -462,10 +452,10 @@ func TestUser(t *testing.T) {
 			description: "get HTTP status 200",
 			statusCode:  200,
 			expectedKeys: []string{
-				"userID",
-				"username",
-				"email",
-				"walletAddress",
+				"Name",
+				"Email",
+				"WalletAddress",
+				"WalletBalance",
 			},
 		},
 		{
@@ -506,6 +496,7 @@ func TestUser(t *testing.T) {
 	}
 }
 
+// Done Post
 func TestRegister(t *testing.T) {
 
 	type wanted struct {
@@ -611,9 +602,7 @@ func TestRegister(t *testing.T) {
 			}
 			defer resp.Body.Close()
 
-			if resp.StatusCode != test.expected.StatusCode {
-				t.Errorf("Expected status code %d, but got %d", test.expected.StatusCode, resp.StatusCode)
-			}
+			assert.Equal(t, test.expected.StatusCode, resp.StatusCode)
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -626,14 +615,13 @@ func TestRegister(t *testing.T) {
 			}
 
 			for _, key := range test.expected.expectedKeys {
-				if _, ok := response[key]; !ok {
-					t.Errorf("Expected JSON key '%s' not found in the response", key)
-				}
+				assert.Contains(t, response, key, "Expected JSON key '%s' not found in the response", key)
 			}
 		})
 	}
 }
 
+// Done Post
 func BenchmarkRegister(b *testing.B) {
 
 	type wanted struct {
@@ -739,9 +727,7 @@ func BenchmarkRegister(b *testing.B) {
 			}
 			defer resp.Body.Close()
 
-			if resp.StatusCode != benchmark.expected.StatusCode {
-				b.Errorf("Expected status code %d, but got %d", benchmark.expected.StatusCode, resp.StatusCode)
-			}
+			assert.Equal(b, benchmark.expected.StatusCode, resp.StatusCode)
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -754,9 +740,7 @@ func BenchmarkRegister(b *testing.B) {
 			}
 
 			for _, key := range benchmark.expected.expectedKeys {
-				if _, ok := response[key]; !ok {
-					b.Errorf("Expected JSON key '%s' not found in the response", key)
-				}
+				assert.Contains(b, response, key, "Expected JSON key '%s' not found in the response", key)
 			}
 		})
 	}

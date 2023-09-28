@@ -9,20 +9,20 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/stretchr/testify/assert"
 )
 
+// Done Get
 func TestBalance(t *testing.T) {
 	app := fiber.New()
 
 	app.Get("/balance", func(c *fiber.Ctx) error {
 		response := map[string]interface{}{
-			"walletID":      1,
-			"walletAddress": "denemeDENEME123456789",
-			"userID":        1,
-			"balance":       123123,
+			"wallet_address": "denemeDENEME123456789",
+			"username":       "deneme",
+			"balance":        123123,
 		}
 		return c.JSON(response)
-
 	})
 
 	tests := []struct {
@@ -34,9 +34,8 @@ func TestBalance(t *testing.T) {
 			description: "get HTTP status 200",
 			statusCode:  200,
 			expectedKeys: []string{
-				"walletID",
-				"walletAddress",
-				"userID",
+				"wallet_address",
+				"username",
 				"balance",
 			},
 		},
@@ -57,9 +56,7 @@ func TestBalance(t *testing.T) {
 				t.Fail()
 			}
 
-			if res.StatusCode != tt.statusCode {
-				t.Errorf("Expected status code %d, got %d", tt.statusCode, res.StatusCode)
-			}
+			assert.Equal(t, tt.statusCode, res.StatusCode, "Expected status code %d, got %d", tt.statusCode, res.StatusCode)
 
 			if len(tt.expectedKeys) > 0 {
 				var response map[string]interface{}
@@ -69,21 +66,19 @@ func TestBalance(t *testing.T) {
 				}
 
 				for _, key := range tt.expectedKeys {
-					if _, ok := response[key]; !ok {
-						t.Errorf("Expected key '%s' not found in response", key)
-					}
+					assert.Contains(t, response, key, "Expected key '%s' not found in response", key)
 				}
 			}
 		})
 	}
 }
 
+// Done Get
 func BenchmarkBalance(b *testing.B) {
 	app := fiber.New()
 
 	app.Get("/balance", func(c *fiber.Ctx) error {
 		response := map[string]interface{}{
-			"walletID":      1,
 			"walletAddress": "denemeDENEME123456789",
 			"userID":        1,
 			"balance":       123123,
@@ -91,51 +86,64 @@ func BenchmarkBalance(b *testing.B) {
 		return c.JSON(response)
 	})
 
-	req := httptest.NewRequest("GET", "/balance", nil)
+	tests := []struct {
+		description  string
+		statusCode   int
+		expectedKeys []string
+	}{
+		{
+			description: "get HTTP status 200",
+			statusCode:  200,
+			expectedKeys: []string{
+				"walletAddress",
+				"userID",
+				"balance",
+			},
+		},
+		{
+			description:  "get HTTP status 200 without expected keys",
+			statusCode:   200,
+			expectedKeys: []string{},
+		},
+	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		res, err := app.Test(req)
-		if err != nil {
-			b.Fatalf("Cannot test Fiber handler: %v", err)
-		}
+	for _, tt := range tests {
+		b.Run(tt.description, func(b *testing.B) {
+			req := httptest.NewRequest("GET", "/balance", nil)
 
-		if res.StatusCode != fiber.StatusOK {
-			b.Fatalf("Expected status code %d, got %d", fiber.StatusOK, res.StatusCode)
-		}
-
-		var response map[string]interface{}
-		err = json.NewDecoder(res.Body).Decode(&response)
-		if err != nil {
-			b.Fatalf("Cannot parse response body: %v", err)
-		}
-
-		expectedKeys := []string{
-			"walletID",
-			"walletAddress",
-			"userID",
-			"balance",
-		}
-
-		for _, key := range expectedKeys {
-			if _, ok := response[key]; !ok {
-				b.Fatalf("Expected key '%s' not found in response", key)
+			res, err := app.Test(req)
+			if err != nil {
+				b.Errorf("Cannot test Fiber handler: %v", err)
+				b.Fail()
 			}
-		}
 
-		res.Body.Close()
+			assert.Equal(b, tt.statusCode, res.StatusCode, "Expected status code %d, got %d", tt.statusCode, res.StatusCode)
+
+			if len(tt.expectedKeys) > 0 {
+				var response map[string]interface{}
+				err = json.NewDecoder(res.Body).Decode(&response)
+				if err != nil {
+					b.Errorf("Cannot parse response body: %v", err)
+				}
+
+				for _, key := range tt.expectedKeys {
+					assert.Contains(b, response, key, "Expected key '%s' not found in response", key)
+				}
+			}
+		})
 	}
 }
 
+// Done Get
 func TestListAllCryptos(t *testing.T) {
 	app := fiber.New()
 	t.Parallel()
 
 	app.Get("/cryptoList", func(c *fiber.Ctx) error {
 		response := map[string]interface{}{
-			"cryptoID":   8,
-			"cryptoname": "ETH",
-			"price":      1626.79198,
+			"crypto_symbol": "ETH",
+			"crypto_name":   "Ethereum",
+			"price":         1623.9262526599507,
 		}
 
 		return c.JSON(response)
@@ -150,8 +158,8 @@ func TestListAllCryptos(t *testing.T) {
 			description: "get HTTP status 200",
 			statusCode:  200,
 			expectedKeys: []string{
-				"cryptoID",
-				"cryptoname",
+				"crypto_symbol",
+				"crypto_name",
 				"price",
 			},
 		},
@@ -172,9 +180,7 @@ func TestListAllCryptos(t *testing.T) {
 				t.Fail()
 			}
 
-			if res.StatusCode != tt.statusCode {
-				t.Errorf("Expected status code %d, got %d", tt.statusCode, res.StatusCode)
-			}
+			assert.Equal(t, tt.statusCode, res.StatusCode, "Expected status code %d, got %d", tt.statusCode, res.StatusCode)
 
 			if len(tt.expectedKeys) > 0 {
 				var response map[string]interface{}
@@ -184,9 +190,7 @@ func TestListAllCryptos(t *testing.T) {
 				}
 
 				for _, key := range tt.expectedKeys {
-					if _, ok := response[key]; !ok {
-						t.Errorf("Expected key '%s' not found in response", key)
-					}
+					assert.Contains(t, response, key, "Expected key '%s' not found in response", key)
 				}
 			}
 		})
@@ -194,18 +198,15 @@ func TestListAllCryptos(t *testing.T) {
 
 }
 
-func TestListCryptoWallet(t *testing.T) {
+// Done Get
+func BenchmarkListAllCryptos(b *testing.B) {
 	app := fiber.New()
-	t.Parallel()
 
-	app.Get("/listcryptowallet", func(c *fiber.Ctx) error {
+	app.Get("/cryptoList", func(c *fiber.Ctx) error {
 		response := map[string]interface{}{
-			"CryptoWalletID":   6,
-			"walletAddress":    "%TE4i760HX6SNt5bMVURZ4dFR+%@@7w",
-			"cryptoID":         7,
-			"cryptoname":       "BTC",
-			"cryptoTotalPrice": 3505818.36,
-			"cryptoAmount":     132,
+			"crypto_symbol": "ETH",
+			"crypto_name":   "Ethereum",
+			"price":         1623.9262526599507,
 		}
 
 		return c.JSON(response)
@@ -220,12 +221,75 @@ func TestListCryptoWallet(t *testing.T) {
 			description: "get HTTP status 200",
 			statusCode:  200,
 			expectedKeys: []string{
-				"CryptoWalletID",
-				"walletAddress",
-				"cryptoID",
-				"cryptoname",
-				"cryptoTotalPrice",
-				"cryptoAmount",
+				"crypto_symbol",
+				"crypto_name",
+				"price",
+			},
+		},
+		{
+			description:  "get HTTP status 200 without expected keys",
+			statusCode:   200,
+			expectedKeys: []string{},
+		},
+	}
+
+	for _, tt := range tests {
+		b.Run(tt.description, func(b *testing.B) {
+			req := httptest.NewRequest("GET", "/cryptoList", nil)
+
+			res, err := app.Test(req)
+			if err != nil {
+				b.Errorf("Cannot test Fiber handler: %v", err)
+				b.Fail()
+			}
+
+			assert.Equal(b, tt.statusCode, res.StatusCode, "Expected status code %d, got %d", tt.statusCode, res.StatusCode)
+
+			if len(tt.expectedKeys) > 0 {
+				var response map[string]interface{}
+				err = json.NewDecoder(res.Body).Decode(&response)
+				if err != nil {
+					b.Errorf("Cannot parse response body: %v", err)
+				}
+
+				for _, key := range tt.expectedKeys {
+					assert.Contains(b, response, key, "Expected key '%s' not found in response", key)
+				}
+			}
+		})
+	}
+
+}
+
+// Done Get
+func TestListCryptoWallet(t *testing.T) {
+	app := fiber.New()
+	t.Parallel()
+
+	app.Get("/listcryptowallet", func(c *fiber.Ctx) error {
+		response := map[string]interface{}{
+			"wallet_address":     "E4i760HX6SNt5bMVURZ4dFR+%@@7w",
+			"crypto_name":        "Bitcoin",
+			"crypto_amount":      7.36,
+			"crypto_total_price": 186936.52406785818,
+		}
+
+		return c.JSON(response)
+	})
+
+	tests := []struct {
+		description  string
+		statusCode   int
+		expectedKeys []string
+	}{
+		{
+			description: "get HTTP status 200",
+			statusCode:  200,
+			expectedKeys: []string{
+				"wallet_address",
+				"crypto_name",
+				"crypto_amount",
+				"crypto_total_price",
 			},
 		},
 		{
@@ -245,9 +309,7 @@ func TestListCryptoWallet(t *testing.T) {
 				t.Fail()
 			}
 
-			if res.StatusCode != tt.statusCode {
-				t.Errorf("Expected status code %d, got %d", tt.statusCode, res.StatusCode)
-			}
+			assert.Equal(t, tt.statusCode, res.StatusCode, "Expected status code %d, got %d", tt.statusCode, res.StatusCode)
 
 			if len(tt.expectedKeys) > 0 {
 				var response map[string]interface{}
@@ -257,9 +319,7 @@ func TestListCryptoWallet(t *testing.T) {
 				}
 
 				for _, key := range tt.expectedKeys {
-					if _, ok := response[key]; !ok {
-						t.Errorf("Expected key '%s' not found in response", key)
-					}
+					assert.Contains(t, response, key, "Expected key '%s' not found in response", key)
 				}
 			}
 		})
@@ -267,63 +327,72 @@ func TestListCryptoWallet(t *testing.T) {
 
 }
 
-func BenchmarkListAllCryptos(b *testing.B) {
-	app := fiber.New()
-
-	app.Get("/cryptoList", func(c *fiber.Ctx) error {
-		response := map[string]interface{}{
-			"cryptoID":   8,
-			"cryptoname": "ETH",
-			"price":      1626.79198,
-		}
-
-		return c.JSON(response)
-	})
-
-	req := httptest.NewRequest("GET", "/cryptoList", nil)
-
-	for i := 0; i < b.N; i++ {
-		res, err := app.Test(req)
-		if err != nil {
-			b.Fatalf("Cannot test Fiber handler: %v", err)
-		}
-
-		if res.StatusCode != 200 {
-			b.Fatalf("Expected status code 200, got %d", res.StatusCode)
-		}
-	}
-}
-
+// Done Get
 func BenchmarkListCryptoWallet(b *testing.B) {
 	app := fiber.New()
 
 	app.Get("/listcryptowallet", func(c *fiber.Ctx) error {
 		response := map[string]interface{}{
-			"CryptoWalletID":   6,
-			"walletAddress":    "%TE4i760HX6SNt5bMVURZ4dFR+%@@7w",
-			"cryptoID":         7,
-			"cryptoname":       "BTC",
-			"cryptoTotalPrice": 3505818.36,
-			"cryptoAmount":     132,
+			"wallet_address":     "E4i760HX6SNt5bMVURZ4dFR+%@@7w",
+			"crypto_name":        "Bitcoin",
+			"crypto_amount":      7.36,
+			"crypto_total_price": 186936.52406785818,
 		}
 
 		return c.JSON(response)
 	})
 
-	req := httptest.NewRequest("GET", "/listcryptowallet", nil)
-
-	for i := 0; i < b.N; i++ {
-		res, err := app.Test(req)
-		if err != nil {
-			b.Fatalf("Cannot test Fiber handler: %v", err)
-		}
-
-		if res.StatusCode != 200 {
-			b.Fatalf("Expected status code 200, got %d", res.StatusCode)
-		}
+	tests := []struct {
+		description  string
+		statusCode   int
+		expectedKeys []string
+	}{
+		{
+			description: "get HTTP status 200",
+			statusCode:  200,
+			expectedKeys: []string{
+				"wallet_address",
+				"crypto_name",
+				"crypto_amount",
+				"crypto_total_price",
+			},
+		},
+		{
+			description:  "get HTTP status 200 without expected keys",
+			statusCode:   200,
+			expectedKeys: []string{},
+		},
 	}
+
+	for _, tt := range tests {
+		b.Run(tt.description, func(b *testing.B) {
+			req := httptest.NewRequest("GET", "/listcryptowallet", nil)
+
+			res, err := app.Test(req)
+			if err != nil {
+				b.Errorf("Cannot test Fiber handler: %v", err)
+				b.Fail()
+			}
+
+			assert.Equal(b, tt.statusCode, res.StatusCode, "Expected status code %d, got %d", tt.statusCode, res.StatusCode)
+
+			if len(tt.expectedKeys) > 0 {
+				var response map[string]interface{}
+				err = json.NewDecoder(res.Body).Decode(&response)
+				if err != nil {
+					b.Errorf("Cannot parse response body: %v", err)
+				}
+
+				for _, key := range tt.expectedKeys {
+					assert.Contains(b, response, key, "Expected key '%s' not found in response", key)
+				}
+			}
+		})
+	}
+
 }
 
+// Done Post
 func TestBuyCrypto(t *testing.T) {
 	type wanted struct {
 		StatusCode   int
@@ -340,7 +409,7 @@ func TestBuyCrypto(t *testing.T) {
 
 		if data["cryptoName"] == "" {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"nameError": "Crypto name does not exists",
+				"nameError": "Crypto name does not exist",
 			})
 		}
 
@@ -421,9 +490,7 @@ func TestBuyCrypto(t *testing.T) {
 			}
 			defer resp.Body.Close()
 
-			if resp.StatusCode != test.expected.StatusCode {
-				t.Errorf("Expected status code %d, but got %d", test.expected.StatusCode, resp.StatusCode)
-			}
+			assert.Equal(t, test.expected.StatusCode, resp.StatusCode)
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -436,14 +503,13 @@ func TestBuyCrypto(t *testing.T) {
 			}
 
 			for _, key := range test.expected.expectedKeys {
-				if _, ok := response[key]; !ok {
-					t.Errorf("Expected JSON key '%s' not found in the response", key)
-				}
+				assert.Contains(t, response, key, "Expected JSON key '%s' not found in the response", key)
 			}
 		})
 	}
 }
 
+// Done Post
 func BenchmarkBuyCrypto(b *testing.B) {
 	type wanted struct {
 		StatusCode   int
@@ -541,9 +607,7 @@ func BenchmarkBuyCrypto(b *testing.B) {
 			}
 			defer resp.Body.Close()
 
-			if resp.StatusCode != benchmark.expected.StatusCode {
-				b.Errorf("Expected status code %d, but got %d", benchmark.expected.StatusCode, resp.StatusCode)
-			}
+			assert.Equal(b, benchmark.expected.StatusCode, resp.StatusCode)
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -556,14 +620,13 @@ func BenchmarkBuyCrypto(b *testing.B) {
 			}
 
 			for _, key := range benchmark.expected.expectedKeys {
-				if _, ok := response[key]; !ok {
-					b.Errorf("Expected JSON key '%s' not found in the response", key)
-				}
+				assert.Contains(b, response, key, "Expected JSON key '%s' not found in the response", key)
 			}
 		})
 	}
 }
 
+// Done Post
 func TestSellCrypto(t *testing.T) {
 	type wanted struct {
 		StatusCode   int
@@ -580,7 +643,7 @@ func TestSellCrypto(t *testing.T) {
 
 		if data["cryptoName"] == "" {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"nameError": "Crypto name does not exists",
+				"nameError": "Crypto name does not exist",
 			})
 		}
 
@@ -661,9 +724,7 @@ func TestSellCrypto(t *testing.T) {
 			}
 			defer resp.Body.Close()
 
-			if resp.StatusCode != test.expected.StatusCode {
-				t.Errorf("Expected status code %d, but got %d", test.expected.StatusCode, resp.StatusCode)
-			}
+			assert.Equal(t, test.expected.StatusCode, resp.StatusCode)
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -676,14 +737,13 @@ func TestSellCrypto(t *testing.T) {
 			}
 
 			for _, key := range test.expected.expectedKeys {
-				if _, ok := response[key]; !ok {
-					t.Errorf("Expected JSON key '%s' not found in the response", key)
-				}
+				assert.Contains(t, response, key, "Expected JSON key '%s' not found in the response", key)
 			}
 		})
 	}
 }
 
+// Done Post
 func BenchmarkSellCrypto(b *testing.B) {
 	type wanted struct {
 		StatusCode   int
@@ -781,9 +841,7 @@ func BenchmarkSellCrypto(b *testing.B) {
 			}
 			defer resp.Body.Close()
 
-			if resp.StatusCode != benchmark.expected.StatusCode {
-				b.Errorf("Expected status code %d, but got %d", benchmark.expected.StatusCode, resp.StatusCode)
-			}
+			assert.Equal(b, benchmark.expected.StatusCode, resp.StatusCode)
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -796,14 +854,13 @@ func BenchmarkSellCrypto(b *testing.B) {
 			}
 
 			for _, key := range benchmark.expected.expectedKeys {
-				if _, ok := response[key]; !ok {
-					b.Errorf("Expected JSON key '%s' not found in the response", key)
-				}
+				assert.Contains(b, response, key, "Expected JSON key '%s' not found in the response", key)
 			}
 		})
 	}
 }
 
+// Done Post
 func TestAddBalance(t *testing.T) {
 	type wanted struct {
 		StatusCode   int
@@ -885,9 +942,7 @@ func TestAddBalance(t *testing.T) {
 			}
 			defer resp.Body.Close()
 
-			if resp.StatusCode != test.expected.StatusCode {
-				t.Errorf("Expected status code %d, but got %d", test.expected.StatusCode, resp.StatusCode)
-			}
+			assert.Equal(t, test.expected.StatusCode, resp.StatusCode)
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -900,14 +955,13 @@ func TestAddBalance(t *testing.T) {
 			}
 
 			for _, key := range test.expected.expectedKeys {
-				if _, ok := response[key]; !ok {
-					t.Errorf("Expected JSON key '%s' not found in the response", key)
-				}
+				assert.Contains(t, response, key, "Expected JSON key '%s' not found in the response", key)
 			}
 		})
 	}
 }
 
+// Done Post
 func BenchmarkAddBalance(b *testing.B) {
 	type wanted struct {
 		StatusCode   int
@@ -989,9 +1043,7 @@ func BenchmarkAddBalance(b *testing.B) {
 			}
 			defer resp.Body.Close()
 
-			if resp.StatusCode != benchmark.expected.StatusCode {
-				b.Errorf("Expected status code %d, but got %d", benchmark.expected.StatusCode, resp.StatusCode)
-			}
+			assert.Equal(b, benchmark.expected.StatusCode, resp.StatusCode)
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -1004,10 +1056,25 @@ func BenchmarkAddBalance(b *testing.B) {
 			}
 
 			for _, key := range benchmark.expected.expectedKeys {
-				if _, ok := response[key]; !ok {
-					b.Errorf("Expected JSON key '%s' not found in the response", key)
-				}
+				assert.Contains(b, response, key, "Expected JSON key '%s' not found in the response", key)
 			}
 		})
 	}
+}
+
+func TestTransactionListCrypto(t *testing.T) {
+	app := fiber.New()
+
+	app.Get("/TransactionListCrypto", func(c *fiber.Ctx) error {
+		response := map[string]interface{}{
+			"walletAddress": "denemeDENEME123456789",
+			"userID":        1,
+			"balance":       123123,
+		}
+		return c.JSON(response)
+	})
+}
+
+func TestTransactionListBalance(t *testing.T) {
+
 }

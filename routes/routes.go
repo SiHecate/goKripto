@@ -53,19 +53,20 @@ func setupAllRoutes(app *fiber.App, timeoutHandler func(*fiber.Ctx) error) {
 }
 
 func setupPostRoutes(app *fiber.App, timeoutHandler func(*fiber.Ctx) error) {
-	app.Post("/api/register", timeoutHandler, AuthController.Register)
-	app.Post("/api/login", timeoutHandler, AuthController.Login)
-	app.Post("/api/logout", timeoutHandler, AuthController.Logout)
-	app.Post("/api/cryptoBuy", Middleware.GetIssuer, timeoutHandler, CryptoControllers.BuyCryptos)
-	app.Post("/api/cryptoSell", Middleware.GetIssuer, timeoutHandler, CryptoControllers.SellCryptos)
-	app.Post("/api/addBalance", Middleware.GetIssuer, timeoutHandler, CryptoControllers.AddBalanceCrypto)
+
+	app.Post("/api/register", timeoutHandler, AuthController.Register)                                    // Integration test done
+	app.Post("/api/login", timeoutHandler, AuthController.Login)                                          // Integration test done
+	app.Post("/api/logout", timeoutHandler, AuthController.Logout)                                        // Integration test done
+	app.Post("/api/cryptoBuy", Middleware.GetIssuer, timeoutHandler, CryptoControllers.BuyCryptos)        // Integration test done
+	app.Post("/api/cryptoSell", Middleware.GetIssuer, timeoutHandler, CryptoControllers.SellCryptos)      // Integration test done
+	app.Post("/api/addBalance", Middleware.GetIssuer, timeoutHandler, CryptoControllers.AddBalanceCrypto) // Integration test done
 }
 
 func setupGetRoutes(app *fiber.App, timeoutHandler func(*fiber.Ctx) error) {
 	app.Get("/api/CryptoTransactionHistory", Middleware.GetIssuer, timeoutHandler, CryptoControllers.TransactionListCrypto)
 	app.Get("/api/BalanceTransactionHistory", Middleware.GetIssuer, timeoutHandler, CryptoControllers.TransactionListBalance)
-	app.Get("/api/user", timeoutHandler, AuthController.User)
-	app.Get("/api/balance", Middleware.GetIssuer, timeoutHandler, CryptoControllers.AccountBalance)
-	app.Get("/api/cryptoList", timeoutHandler, CryptoControllers.ListAllCryptos)
-	app.Get("/api/listcryptowallet", Middleware.GetIssuer, timeoutHandler, CryptoControllers.ListCryptoWallet)
+	app.Get("/api/user", timeoutHandler, AuthController.User)                                                  // Integration test done
+	app.Get("/api/balance", Middleware.GetIssuer, timeoutHandler, CryptoControllers.AccountBalance)            // Integration test done
+	app.Get("/api/cryptoList", timeoutHandler, CryptoControllers.ListAllCryptos)                               // Integration test done
+	app.Get("/api/listcryptowallet", Middleware.GetIssuer, timeoutHandler, CryptoControllers.ListCryptoWallet) // Integration test done
 }

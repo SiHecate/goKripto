@@ -16,3 +16,4 @@ func GetUserByWalletAddress(db *gorm.DB, walletAddress string) (*model.User, err
 
 https://github.com/golang-standards/project-layout
 https://github.com/yakuter
+https://github.com/yakuter/go-clean-code

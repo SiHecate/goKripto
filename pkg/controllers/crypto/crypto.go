@@ -15,6 +15,18 @@ import (
 	"gorm.io/gorm"
 )
 
+type CryptoController interface {
+	AddAllCryptoData(ws *websocket.Conn) error
+	ListAllCryptos(c *fiber.Ctx) error
+	AccountBalance(c *fiber.Ctx) error
+	AddBalanceCrypto(c *fiber.Ctx) error
+	BuyCryptos(c *fiber.Ctx) error
+	SellCryptos(c *fiber.Ctx) error
+	TransactionListBalance(c *fiber.Ctx) error
+	TransactionListCrypto(c *fiber.Ctx) error
+	ListCryptoWallet(c *fiber.Ctx) error
+}
+
 func AddAllCryptoData(ws *websocket.Conn) error {
 	apiURL := "https://api.coincap.io/v2/assets"
 

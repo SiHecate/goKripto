@@ -1,8 +1,10 @@
 package database
 
 import (
+	"fmt"
 	model "gokripto/Model"
 
+	"github.com/stretchr/testify/mock"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -22,6 +24,7 @@ func DBConnection() {
 	if err != nil {
 		panic("Database error: " + err.Error())
 	}
+	fmt.Println(DB)
 }
 
 func MigrateTables() {
@@ -45,4 +48,29 @@ func DownTables() {
 		&model.TransactionBalance{},
 		&model.TransactionCrypto{},
 	)
+}
+
+// type MockDBConnection struct {
+// 	mock.Mock
+// }
+
+// func (m *MockDBConnection) DBConnection() *gorm.DB {
+// 	args := m.Called()
+// 	return args.Get(0).(*gorm.DB)
+// }
+
+type MockMigrateTables struct {
+	mock.Mock
+}
+
+func (m *MockMigrateTables) MigrateTables() {
+	m.Called()
+}
+
+type MockDownTables struct {
+	mock.Mock
+}
+
+func (m *MockDownTables) DownTables() {
+	m.Called()
 }

@@ -5,6 +5,6 @@ RUN git config --global --add safe.directory /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-CMD ["air", "-c", ".air.toml"]
+CMD ["air", "-c", ".air.toml", "test", "./..."]
 
 COPY . .
