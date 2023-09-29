@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	controllers "gokripto/pkg/controllers/crypto"
+	controllers "gokripto/controllers/crypto"
 	"log"
 	"time"
 

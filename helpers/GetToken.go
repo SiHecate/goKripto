@@ -1,11 +1,12 @@
-package controllers
+package helpers
 
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 )
 
-// Extract the token and issuer (user ID) from the JWT token.
+const SecretKey = "secret"
+
 func GetToken(c *fiber.Ctx) (string, error) {
 	cookie := c.Cookies("jwt")
 	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {

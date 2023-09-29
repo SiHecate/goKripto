@@ -5,7 +5,7 @@ import (
 	"fmt"
 	model "gokripto/Model"
 	"gokripto/database"
-	helpers "gokripto/pkg/helpers"
+	helpers "gokripto/helpers"
 	"net/http"
 	"strconv"
 	"time"
@@ -14,18 +14,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
-
-type CryptoController interface {
-	AddAllCryptoData(ws *websocket.Conn) error
-	ListAllCryptos(c *fiber.Ctx) error
-	AccountBalance(c *fiber.Ctx) error
-	AddBalanceCrypto(c *fiber.Ctx) error
-	BuyCryptos(c *fiber.Ctx) error
-	SellCryptos(c *fiber.Ctx) error
-	TransactionListBalance(c *fiber.Ctx) error
-	TransactionListCrypto(c *fiber.Ctx) error
-	ListCryptoWallet(c *fiber.Ctx) error
-}
 
 func AddAllCryptoData(ws *websocket.Conn) error {
 	apiURL := "https://api.coincap.io/v2/assets"
@@ -86,7 +74,7 @@ func createOrUpdateCrypto(symbol string, name string, price string) error {
 	}
 
 	var crypto model.Crypto
-	result := database.DB.Where("symbol = ?", symbol).First(&crypto)
+	result := database.Conn.Where("symbol = ?", symbol).First(&crypto)
 	switch {
 	case result.Error != nil:
 		crypto := model.Crypto{
@@ -94,7 +82,7 @@ func createOrUpdateCrypto(symbol string, name string, price string) error {
 			Name:   name,
 			Price:  priceFloat,
 		}
-		if err := database.DB.Create(&crypto).Error; err != nil {
+		if err := database.Conn.Create(&crypto).Error; err != nil {
 			return err
 		}
 	case result.Error != nil:
@@ -102,7 +90,7 @@ func createOrUpdateCrypto(symbol string, name string, price string) error {
 
 	default:
 		crypto.Price = priceFloat
-		database.DB.Save(&crypto)
+		database.Conn.Save(&crypto)
 	}
 
 	return nil
@@ -122,7 +110,7 @@ func sendJSONResponse(ws *websocket.Conn, responseMessage fiber.Map) {
 
 func ListAllCryptos(c *fiber.Ctx) error {
 	var cryptos []model.Crypto
-	if err := database.DB.Find(&cryptos).Error; err != nil {
+	if err := database.Conn.Find(&cryptos).Error; err != nil {
 		return err
 	}
 
@@ -149,18 +137,18 @@ func AccountBalance(c *fiber.Ctx) error {
 		return err
 	}
 
-	WalletAddress, err := helpers.GetWalletAddress(issuer)
+	WalletAddress, err := model.GetWalletAddress(database.Conn, issuer)
 	if err != nil {
 		return err
 	}
 
 	var wallet model.Wallet
-	if err := database.DB.Where("wallet_address = ?", WalletAddress).First(&wallet).Error; err != nil {
+	if err := database.Conn.Where("wallet_address = ?", WalletAddress).First(&wallet).Error; err != nil {
 		return err
 	}
 
 	var user model.User
-	if err := database.DB.Where("id = ?", issuer).Preload("Wallet").First(&user).Error; err != nil {
+	if err := database.Conn.Where("id = ?", issuer).Preload("Wallet").First(&user).Error; err != nil {
 		return err
 	}
 
@@ -179,7 +167,7 @@ func AccountBalance(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-func AddBalanceCrypto(c *fiber.Ctx) error {
+func AddbalanceCrypto(c *fiber.Ctx) error {
 	issuer, err := helpers.GetIssuerFromContext(c)
 	if err != nil {
 		return err
@@ -189,32 +177,32 @@ func AddBalanceCrypto(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 	}
 
-	addBalance := data["addBalance"].(float64)
+	adConnalance := data["adConnalance"].(float64)
 
-	WalletAddress, err := helpers.GetWalletAddress(issuer)
+	WalletAddress, err := model.GetWalletAddress(database.Conn, issuer)
 	if err != nil {
 		return err
 	}
 
 	var availableBalance float64
-	if err := database.DB.Model(model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &availableBalance).Error; err != nil {
+	if err := database.Conn.Model(model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &availableBalance).Error; err != nil {
 		return err
 	}
 
-	TotalBalance := addBalance + availableBalance
+	TotalBalance := adConnalance + availableBalance
 
-	if err := database.DB.Model(model.Wallet{}).Where("user_id = ?", issuer).Update("Balance", TotalBalance).Error; err != nil {
+	if err := database.Conn.Model(model.Wallet{}).Where("user_id = ?", issuer).Update("Balance", TotalBalance).Error; err != nil {
 		return err
 	}
 
-	TransactionBalance(c, issuer, WalletAddress, addBalance, "Deposit", "Balance Adding")
-	type addBalanceResponse struct {
+	TransactionBalance(c, issuer, WalletAddress, adConnalance, "Deposit", "Balance Adding")
+	type adConnalanceResponse struct {
 		Issuer           string  `json:"issuer"`
 		AvailableBalance float64 `json:"available_balance"`
 		TotalBalance     float64 `json:"added_balance"`
 	}
 
-	response := addBalanceResponse{
+	response := adConnalanceResponse{
 		Issuer:           issuer,
 		AvailableBalance: availableBalance,
 		TotalBalance:     TotalBalance,
@@ -257,12 +245,12 @@ func BuyCryptos(c *fiber.Ctx) error {
 	}
 
 	var cryptoPrice float64
-	if err := database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice).Error; err != nil {
+	if err := database.Conn.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice).Error; err != nil {
 		return err
 	}
 
 	var userBalance float64
-	if err := database.DB.Model(&model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &userBalance).Error; err != nil {
+	if err := database.Conn.Model(&model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &userBalance).Error; err != nil {
 		return err
 	}
 
@@ -278,19 +266,19 @@ func BuyCryptos(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := database.DB.Model(&model.Wallet{}).Where("user_id = ?", issuer).Update("balance", totalBalance).Error; err != nil {
+	if err := database.Conn.Model(&model.Wallet{}).Where("user_id = ?", issuer).Update("balance", totalBalance).Error; err != nil {
 		return err
 	}
 
 	var cryptoID uint
-	if err := database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("id", &cryptoID).Error; err != nil {
+	if err := database.Conn.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("id", &cryptoID).Error; err != nil {
 		return err
 	}
 
 	modelWallet := model.Wallet{}
-	database.DB.Where("user_id = ?", issuer).Find(&modelWallet)
+	database.Conn.Where("user_id = ?", issuer).Find(&modelWallet)
 
-	WalletAddress, err := helpers.GetWalletAddress(issuer)
+	WalletAddress, err := model.GetWalletAddress(database.Conn, issuer)
 	if err != nil {
 		return err
 	}
@@ -351,28 +339,28 @@ func SellCryptos(c *fiber.Ctx) error {
 	}
 
 	var userBalance float64
-	if err := database.DB.Model(&model.Wallet{}).Where("id = ?", issuer).Pluck("balance", &userBalance).Error; err != nil {
+	if err := database.Conn.Model(&model.Wallet{}).Where("id = ?", issuer).Pluck("balance", &userBalance).Error; err != nil {
 		return err
 	}
 
 	var cryptoPrice float64
-	database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice)
+	database.Conn.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice)
 
 	totalProfit := cryptoPrice * amountToSell
 	totalBalance := userBalance + totalProfit
-	if err := database.DB.Model(&model.Wallet{}).Where("user_id = ?", issuer).Update("balance", totalBalance).Error; err != nil {
+	if err := database.Conn.Model(&model.Wallet{}).Where("user_id = ?", issuer).Update("balance", totalBalance).Error; err != nil {
 		return err
 	}
 
 	var cryptoID uint
-	if err := database.DB.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("id", &cryptoID).Error; err != nil {
+	if err := database.Conn.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("id", &cryptoID).Error; err != nil {
 		return err
 	}
 
 	modelWallet := model.Wallet{}
-	database.DB.Where("user_id = ?", issuer).Find(&modelWallet)
+	database.Conn.Where("user_id = ?", issuer).Find(&modelWallet)
 
-	WalletAddress, err := helpers.GetWalletAddress(issuer)
+	WalletAddress, err := model.GetWalletAddress(database.Conn, issuer)
 	if err != nil {
 		return err
 	}
@@ -412,7 +400,7 @@ func TransactionBalance(c *fiber.Ctx, UserID string, WalletAddress string, Balan
 		Date:          time.Now(),
 	}
 
-	if err := database.DB.Create(&TransactionBalance).Error; err != nil {
+	if err := database.Conn.Create(&TransactionBalance).Error; err != nil {
 		return err
 	}
 
@@ -428,7 +416,7 @@ func TransactionListBalance(c *fiber.Ctx) error {
 	}
 
 	var TransactionBalance []model.TransactionBalance
-	if err := database.DB.Where("user_id = ?", issuer).Find(&TransactionBalance).Error; err != nil {
+	if err := database.Conn.Where("user_id = ?", issuer).Find(&TransactionBalance).Error; err != nil {
 		return err
 	}
 
@@ -446,7 +434,7 @@ func TransactionCryptos(c *fiber.Ctx, UserID string, WalletAddres string, price 
 		Date:         time.Now(),
 	}
 
-	if err := database.DB.Create(&TransactionCryptos).Error; err != nil {
+	if err := database.Conn.Create(&TransactionCryptos).Error; err != nil {
 		return err
 	}
 
@@ -462,7 +450,7 @@ func TransactionListCrypto(c *fiber.Ctx) error {
 	}
 
 	var TransactionCryptos []model.TransactionCrypto
-	if err := database.DB.Where("user_id = ?", issuer).Find(&TransactionCryptos).Error; err != nil {
+	if err := database.Conn.Where("user_id = ?", issuer).Find(&TransactionCryptos).Error; err != nil {
 		return err
 	}
 
@@ -471,7 +459,7 @@ func TransactionListCrypto(c *fiber.Ctx) error {
 
 func CryptoWallet(User string, CryptoName string, CryptoPrice float64, Amount float64, ProcessType string) error {
 	var existingCryptoWallet model.CryptoWallet
-	WalletAddress, err := helpers.GetWalletAddress(User)
+	WalletAddress, err := model.GetWalletAddress(database.Conn, User)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return err
@@ -479,7 +467,7 @@ func CryptoWallet(User string, CryptoName string, CryptoPrice float64, Amount fl
 
 	UserInt, err := strconv.Atoi(User)
 
-	result := database.DB.Preload("Wallet", func(tx *gorm.DB) *gorm.DB {
+	result := database.Conn.Preload("Wallet", func(tx *gorm.DB) *gorm.DB {
 		return tx.Where("wallet_address = ?", WalletAddress)
 	}).Where("crypto_name = ?", CryptoName).First(&existingCryptoWallet)
 
@@ -496,17 +484,17 @@ func CryptoWallet(User string, CryptoName string, CryptoPrice float64, Amount fl
 		if result.Error == nil {
 			existingCryptoWallet.Amount += Amount
 			existingCryptoWallet.CryptoTotalPrice += CryptoTotalPrice
-			database.DB.Save(&existingCryptoWallet)
+			database.Conn.Save(&existingCryptoWallet)
 		} else {
-			database.DB.Create(&newCryptoWallet)
+			database.Conn.Create(&newCryptoWallet)
 		}
 	} else if ProcessType == "sell" {
 		if result.Error == nil {
 			existingCryptoWallet.Amount -= Amount
 			existingCryptoWallet.CryptoTotalPrice -= CryptoTotalPrice
-			database.DB.Save(&existingCryptoWallet)
+			database.Conn.Save(&existingCryptoWallet)
 		} else {
-			database.DB.Create(&newCryptoWallet)
+			database.Conn.Create(&newCryptoWallet)
 		}
 	}
 
@@ -519,9 +507,15 @@ func ListCryptoWallet(c *fiber.Ctx) error {
 		return err
 	}
 
-	var cryptoWallets []model.CryptoWallet
+	WalletAddress, err := model.GetWalletAddress(database.Conn, issuer)
+	if err != nil {
+		return err
+	}
 
-	database.DB.Preload("Wallet").Where("wallet_id = ?", issuer).Find(&cryptoWallets)
+	cryptoWallets, err := model.GetCryptoWalletsByWalletAddress(database.Conn, issuer)
+	if err != nil {
+		return err
+	}
 
 	type WalletListResponse struct {
 		WalletAddress    string  `json:"wallet_address"`
@@ -530,10 +524,6 @@ func ListCryptoWallet(c *fiber.Ctx) error {
 		CryptoTotalPrice float64 `json:"crypto_total_price"`
 	}
 
-	WalletAddress, err := helpers.GetWalletAddress(issuer)
-	if err != nil {
-		return err
-	}
 	var response []WalletListResponse
 	for _, cryptoWallet := range cryptoWallets {
 		response = append(response, WalletListResponse{

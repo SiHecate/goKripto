@@ -1,72 +1,32 @@
 package routes
 
 import (
-	AuthController "gokripto/pkg/controllers/auth"
-	CryptoControllers "gokripto/pkg/controllers/crypto"
-	Middleware "gokripto/pkg/middlewares"
-
-	"log"
-	"time"
+	AuthController "gokripto/controllers/auth"
+	CryptoControllers "gokripto/controllers/crypto"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func Setup(app *fiber.App) {
-	timeoutDuration := 2000 * time.Millisecond
-
-	setupAllRoutes(app, timeoutHandler(timeoutDuration))
+	InitializeRouter(app)
 }
 
-func timeoutHandler(timeoutDuration time.Duration) func(*fiber.Ctx) error {
-	return func(c *fiber.Ctx) error {
-		ch := make(chan struct{})
+func InitializeRouter(app *fiber.App) {
+	user := app.Group("/user")
+	user.Post("/register", AuthController.Register)
+	user.Post("/login", AuthController.Login)
+	user.Get("/user", AuthController.User)
+	user.Post("/logout", AuthController.Logout)
+	user.Post("/cryptoWallet", CryptoControllers.ListCryptoWallet)
+	user.Get("/balance", CryptoControllers.AccountBalance)
+	user.Post("/addBalance", CryptoControllers.AddbalanceCrypto)
 
-		go func() {
-			defer close(ch)
-			err := c.Next()
-			if err != nil {
-				log.Println("İstek işlenirken hata oluştu:", err)
-			}
-		}()
+	crypto := app.Group("/crypto")
+	crypto.Post("/cryptoBuy", CryptoControllers.BuyCryptos)
+	crypto.Post("/cryptoSell", CryptoControllers.SellCryptos)
+	crypto.Get("/cryptoList", CryptoControllers.ListAllCryptos)
 
-		Loading := true
-
-		for Loading {
-			select {
-			case <-time.After(timeoutDuration):
-				log.Println(c.Route().Path)
-				return c.Status(fiber.StatusRequestTimeout).JSON(fiber.Map{
-					"message": "Timeout. Endpoint operation successful",
-				})
-			case <-ch:
-				Loading = false
-			}
-		}
-		return nil
-	}
-}
-
-func setupAllRoutes(app *fiber.App, timeoutHandler func(*fiber.Ctx) error) {
-	setupPostRoutes(app, timeoutHandler)
-	setupGetRoutes(app, timeoutHandler)
-
-}
-
-func setupPostRoutes(app *fiber.App, timeoutHandler func(*fiber.Ctx) error) {
-
-	app.Post("/api/register", timeoutHandler, AuthController.Register)                                    // Integration test done
-	app.Post("/api/login", timeoutHandler, AuthController.Login)                                          // Integration test done
-	app.Post("/api/logout", timeoutHandler, AuthController.Logout)                                        // Integration test done
-	app.Post("/api/cryptoBuy", Middleware.GetIssuer, timeoutHandler, CryptoControllers.BuyCryptos)        // Integration test done
-	app.Post("/api/cryptoSell", Middleware.GetIssuer, timeoutHandler, CryptoControllers.SellCryptos)      // Integration test done
-	app.Post("/api/addBalance", Middleware.GetIssuer, timeoutHandler, CryptoControllers.AddBalanceCrypto) // Integration test done
-}
-
-func setupGetRoutes(app *fiber.App, timeoutHandler func(*fiber.Ctx) error) {
-	app.Get("/api/CryptoTransactionHistory", Middleware.GetIssuer, timeoutHandler, CryptoControllers.TransactionListCrypto)
-	app.Get("/api/BalanceTransactionHistory", Middleware.GetIssuer, timeoutHandler, CryptoControllers.TransactionListBalance)
-	app.Get("/api/user", timeoutHandler, AuthController.User)                                                  // Integration test done
-	app.Get("/api/balance", Middleware.GetIssuer, timeoutHandler, CryptoControllers.AccountBalance)            // Integration test done
-	app.Get("/api/cryptoList", timeoutHandler, CryptoControllers.ListAllCryptos)                               // Integration test done
-	app.Get("/api/listcryptowallet", Middleware.GetIssuer, timeoutHandler, CryptoControllers.ListCryptoWallet) // Integration test done
+	transaction := app.Group("/transaction")
+	transaction.Get("/cryptoTransaction", CryptoControllers.TransactionListCrypto)
+	transaction.Get("/balanceTransaction", CryptoControllers.TransactionListBalance)
 }
