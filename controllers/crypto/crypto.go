@@ -420,7 +420,7 @@ func TransactionListBalance(c *fiber.Ctx) error {
 		WalletAddres  string  `json:"wallet_address"`
 		BalanceAmount float64 `json:"price"`
 		Type          string  `json:"type"`
-		TypeInfo      string  `json:"type_info`
+		TypeInfo      string  `json:"type_info"`
 	}
 
 	var response []TransactionResponse
