@@ -43,5 +43,6 @@ require (
 
 require (
 	github.com/fasthttp/websocket v1.5.4
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
 )

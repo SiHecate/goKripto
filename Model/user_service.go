@@ -31,7 +31,7 @@ func GetUserByEmail(db *gorm.DB, email string) (*User, error) {
 	return &user, nil
 }
 
-func GetWalletAddress(db *gorm.DB, issuer string) (string, error) {
+func GetWalletAddressByIssuer(db *gorm.DB, issuer string) (string, error) {
 	var wallet Wallet
 
 	if err := db.Where("user_id = ?", issuer).First(&wallet).Error; err != nil {
@@ -42,11 +42,37 @@ func GetWalletAddress(db *gorm.DB, issuer string) (string, error) {
 	return WalletAddress, nil
 }
 
-func GetCryptoWalletsByWalletAddress(db *gorm.DB, walletAddress string) ([]CryptoWallet, error) {
+func GetWalletAddress(db *gorm.DB, issuer string) (string, error) {
+	var wallet Wallet
+
+	if err := db.Where("user_id = ?", issuer).First(&wallet).Error; err != nil {
+		return "", err
+	}
+	WalletAddress := wallet.WalletAddress
+	return WalletAddress, nil
+}
+
+func GetWalletbyWalletAddress(db *gorm.DB, WalletAddress string) (*Wallet, error) {
+	var wallet Wallet
+	if err := db.Where("wallet_address = ?", WalletAddress).First(&wallet).Error; err != nil {
+		return nil, err
+	}
+	return &wallet, nil
+}
+
+func GetCryptoWallet(db *gorm.DB, wallet_id string) ([]CryptoWallet, error) {
 	var cryptoWallets []CryptoWallet
 
-	if err := db.Where("walletAddress = ?", walletAddress).Find(&cryptoWallets).Error; err != nil {
+	if err := db.Where("wallet_id = ?", wallet_id).Find(&cryptoWallets).Error; err != nil {
 		return nil, err
 	}
 	return cryptoWallets, nil
+}
+
+func GetAllCryptos(db *gorm.DB) ([]Crypto, error) {
+	var cryptos []Crypto
+	if err := db.Find(&cryptos).Error; err != nil {
+		return nil, err
+	}
+	return cryptos, nil
 }

@@ -3,13 +3,14 @@ package controllers
 import (
 	model "gokripto/Model"
 	"gokripto/database"
+	"gokripto/helpers"
 	helper "gokripto/helpers"
 	"gokripto/repositories"
 	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -85,13 +86,15 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
+	// JWT oluşturma işlemi
+	expiresAt := jwt.NewNumericDate(time.Now().Add(time.Hour * 2)).Time.Unix()
+
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Issuer:    strconv.Itoa(int(user.ID)),
-		ExpiresAt: time.Now().Add(time.Hour * 2).Unix(),
+		ExpiresAt: expiresAt,
 	})
 
 	token, err := claims.SignedString([]byte(SecretKey))
-
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Could not log in",
@@ -128,15 +131,10 @@ func Logout(c *fiber.Ctx) error {
 }
 
 func User(c *fiber.Ctx) error {
-	issuer, err := helper.GetToken(c)
+	issuer, err := helpers.GetIssuer(c)
 	if err != nil {
-		c.Status(fiber.StatusUnauthorized)
-		return c.JSON(fiber.Map{
-			"message": "unauthenticated",
-		})
+		return err
 	}
-
-	userRepo := repositories.NewUserRepository(database.Conn)
 
 	user, err := model.GetUserByIssuer(database.Conn, issuer)
 	if err != nil {
@@ -145,7 +143,7 @@ func User(c *fiber.Ctx) error {
 		})
 	}
 
-	walletAddress, err := userRepo.GetWalletAddress(issuer)
+	walletAddress, err := model.GetWalletAddress(database.Conn, issuer)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "Wallet not found",

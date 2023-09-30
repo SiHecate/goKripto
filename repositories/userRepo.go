@@ -47,14 +47,3 @@ func (repo *UserRepository) CreateUser(data struct {
 
 	return &user, nil
 }
-
-func (repo *UserRepository) GetWalletAddress(issuer string) (string, error) {
-	modelWallet := model.Wallet{}
-
-	if err := database.Conn.Where("user_id = ?", issuer).First(&modelWallet).Error; err != nil {
-		return "", err
-	}
-
-	WalletAddress := modelWallet.WalletAddress
-	return WalletAddress, nil
-}

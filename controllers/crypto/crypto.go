@@ -8,7 +8,6 @@ import (
 	helpers "gokripto/helpers"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/fasthttp/websocket"
 	"github.com/gofiber/fiber/v2"
@@ -24,7 +23,7 @@ func AddAllCryptoData(ws *websocket.Conn) error {
 			"message": "Failed to fetch crypto data from the API.",
 			"error":   err.Error(),
 		}
-		sendJSONError(ws, errorMessage)
+		helpers.SendJSONError(ws, errorMessage)
 		return err
 	}
 	defer response.Body.Close()
@@ -33,7 +32,7 @@ func AddAllCryptoData(ws *websocket.Conn) error {
 		errorMessage := fiber.Map{
 			"message": "HTTP Error: " + strconv.Itoa(response.StatusCode),
 		}
-		sendJSONError(ws, errorMessage)
+		helpers.SendJSONError(ws, errorMessage)
 		return nil
 	}
 
@@ -44,7 +43,7 @@ func AddAllCryptoData(ws *websocket.Conn) error {
 			"message": "Failed to parse API response.",
 			"error":   err.Error(),
 		}
-		sendJSONError(ws, errorMessage)
+		helpers.SendJSONError(ws, errorMessage)
 		return err
 	}
 
@@ -54,7 +53,7 @@ func AddAllCryptoData(ws *websocket.Conn) error {
 				"message": "Failed to add or update crypto data in the database.",
 				"error":   err.Error(),
 			}
-			sendJSONError(ws, errorMessage)
+			helpers.SendJSONError(ws, errorMessage)
 			return err
 		}
 	}
@@ -62,7 +61,7 @@ func AddAllCryptoData(ws *websocket.Conn) error {
 	successMessage := fiber.Map{
 		"message": "All crypto data added or updated successfully",
 	}
-	sendJSONResponse(ws, successMessage)
+	helpers.SendJSONResponse(ws, successMessage)
 
 	return nil
 }
@@ -96,24 +95,11 @@ func createOrUpdateCrypto(symbol string, name string, price string) error {
 	return nil
 }
 
-func sendJSONError(ws *websocket.Conn, errorMessage fiber.Map) {
-	err := ws.WriteJSON(errorMessage)
-	if err != nil {
-	}
-}
-
-func sendJSONResponse(ws *websocket.Conn, responseMessage fiber.Map) {
-	err := ws.WriteJSON(responseMessage)
-	if err != nil {
-	}
-}
-
 func ListAllCryptos(c *fiber.Ctx) error {
-	var cryptos []model.Crypto
-	if err := database.Conn.Find(&cryptos).Error; err != nil {
+	cryptos, err := model.GetAllCryptos(database.Conn)
+	if err != nil {
 		return err
 	}
-
 	type ListAllCrypto struct {
 		Symbol string  `json:"crypto_symbol"`
 		Name   string  `json:"crypto_name"`
@@ -132,24 +118,31 @@ func ListAllCryptos(c *fiber.Ctx) error {
 }
 
 func AccountBalance(c *fiber.Ctx) error {
-	issuer, err := helpers.GetIssuerFromContext(c)
+	issuer, err := helpers.GetIssuer(c)
 	if err != nil {
 		return err
 	}
 
-	WalletAddress, err := model.GetWalletAddress(database.Conn, issuer)
+	WalletAddress, err := model.GetWalletAddressByIssuer(database.Conn, issuer)
 	if err != nil {
 		return err
 	}
 
-	var wallet model.Wallet
-	if err := database.Conn.Where("wallet_address = ?", WalletAddress).First(&wallet).Error; err != nil {
+	wallet, err := model.GetWalletbyWalletAddress(database.Conn, WalletAddress)
+	if err != nil {
 		return err
 	}
 
-	var user model.User
-	if err := database.Conn.Where("id = ?", issuer).Preload("Wallet").First(&user).Error; err != nil {
+	user, err := model.GetUserByIssuer(database.Conn, issuer)
+	if err != nil {
 		return err
+	}
+
+	walletAddress, err := model.GetWalletAddress(database.Conn, issuer)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "Wallet not found",
+		})
 	}
 
 	type WalletResponse struct {
@@ -159,7 +152,7 @@ func AccountBalance(c *fiber.Ctx) error {
 	}
 
 	response := WalletResponse{
-		WalletAddress: wallet.WalletAddress,
+		WalletAddress: walletAddress,
 		Username:      user.Name,
 		Balance:       wallet.Balance,
 	}
@@ -167,45 +160,50 @@ func AccountBalance(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-func AddbalanceCrypto(c *fiber.Ctx) error {
-	issuer, err := helpers.GetIssuerFromContext(c)
+func AddBalanceCrypto(c *fiber.Ctx) error {
+	issuer, err := helpers.GetIssuer(c)
 	if err != nil {
 		return err
 	}
 
-	var data map[string]interface{}
-	if err := c.BodyParser(&data); err != nil {
+	var data struct {
+		AddBalance float64 `json:"add_balance"`
 	}
 
-	adConnalance := data["adConnalance"].(float64)
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
 
-	WalletAddress, err := model.GetWalletAddress(database.Conn, issuer)
+	addBalance := data.AddBalance
+
+	walletAddress, err := model.GetWalletAddressByIssuer(database.Conn, issuer)
 	if err != nil {
 		return err
 	}
 
 	var availableBalance float64
-	if err := database.Conn.Model(model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &availableBalance).Error; err != nil {
+	if err := database.Conn.Model(&model.Wallet{}).Where("user_id = ?", issuer).Pluck("balance", &availableBalance).Error; err != nil {
 		return err
 	}
 
-	TotalBalance := adConnalance + availableBalance
+	totalBalance := addBalance + availableBalance
 
-	if err := database.Conn.Model(model.Wallet{}).Where("user_id = ?", issuer).Update("Balance", TotalBalance).Error; err != nil {
+	if err := database.Conn.Model(&model.Wallet{}).Where("user_id = ?", issuer).Update("balance", totalBalance).Error; err != nil {
 		return err
 	}
 
-	TransactionBalance(c, issuer, WalletAddress, adConnalance, "Deposit", "Balance Adding")
-	type adConnalanceResponse struct {
+	TransactionBalance(c, issuer, walletAddress, addBalance, "Deposit", "Balance Adding")
+
+	type AddBalanceResponse struct {
 		Issuer           string  `json:"issuer"`
 		AvailableBalance float64 `json:"available_balance"`
 		TotalBalance     float64 `json:"added_balance"`
 	}
 
-	response := adConnalanceResponse{
+	response := AddBalanceResponse{
 		Issuer:           issuer,
 		AvailableBalance: availableBalance,
-		TotalBalance:     TotalBalance,
+		TotalBalance:     totalBalance,
 	}
 
 	return c.JSON(response)
@@ -214,8 +212,7 @@ func AddbalanceCrypto(c *fiber.Ctx) error {
 const SecretKey = "secret"
 
 func BuyCryptos(c *fiber.Ctx) error {
-
-	issuer, err := helpers.GetIssuerFromContext(c)
+	issuer, err := helpers.GetIssuer(c)
 	if err != nil {
 		return err
 	}
@@ -278,7 +275,7 @@ func BuyCryptos(c *fiber.Ctx) error {
 	modelWallet := model.Wallet{}
 	database.Conn.Where("user_id = ?", issuer).Find(&modelWallet)
 
-	WalletAddress, err := model.GetWalletAddress(database.Conn, issuer)
+	WalletAddress, err := model.GetWalletAddressByIssuer(database.Conn, issuer)
 	if err != nil {
 		return err
 	}
@@ -309,8 +306,7 @@ func BuyCryptos(c *fiber.Ctx) error {
 }
 
 func SellCryptos(c *fiber.Ctx) error {
-
-	issuer, err := helpers.GetIssuerFromContext(c)
+	issuer, err := helpers.GetIssuer(c)
 	if err != nil {
 		return err
 	}
@@ -360,7 +356,7 @@ func SellCryptos(c *fiber.Ctx) error {
 	modelWallet := model.Wallet{}
 	database.Conn.Where("user_id = ?", issuer).Find(&modelWallet)
 
-	WalletAddress, err := model.GetWalletAddress(database.Conn, issuer)
+	WalletAddress, err := model.GetWalletAddressByIssuer(database.Conn, issuer)
 	if err != nil {
 		return err
 	}
@@ -397,7 +393,6 @@ func TransactionBalance(c *fiber.Ctx, UserID string, WalletAddress string, Balan
 		BalanceAmount: float64(BalanceAmount),
 		Type:          transactionType,
 		TypeInfo:      transactionInfo,
-		Date:          time.Now(),
 	}
 
 	if err := database.Conn.Create(&TransactionBalance).Error; err != nil {
@@ -410,7 +405,7 @@ func TransactionBalance(c *fiber.Ctx, UserID string, WalletAddress string, Balan
 }
 
 func TransactionListBalance(c *fiber.Ctx) error {
-	issuer, err := helpers.GetIssuerFromContext(c)
+	issuer, err := helpers.GetIssuer(c)
 	if err != nil {
 		return err
 	}
@@ -420,18 +415,37 @@ func TransactionListBalance(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(TransactionBalance)
+	type TransactionResponse struct {
+		UserID        string  `json:"user_id"`
+		WalletAddres  string  `json:"wallet_address"`
+		BalanceAmount float64 `json:"price"`
+		Type          string  `json:"type"`
+		TypeInfo      string  `json:"type_info`
+	}
+
+	var response []TransactionResponse
+
+	for _, transaction := range TransactionBalance {
+		response = append(response, TransactionResponse{
+			UserID:        issuer,
+			WalletAddres:  transaction.WalletAddress,
+			BalanceAmount: transaction.BalanceAmount,
+			Type:          transaction.Type,
+			TypeInfo:      transaction.TypeInfo,
+		})
+	}
+
+	return c.JSON(response)
 }
 
 func TransactionCryptos(c *fiber.Ctx, UserID string, WalletAddres string, price float64, cryptoname string, amount float64, transactionType string) error {
 	TransactionCryptos := model.TransactionCrypto{
 		UserID:       UserID,
 		WalletAddres: WalletAddres,
-		Price:        float64(price),
+		Price:        price,
 		CryptoName:   cryptoname,
-		Amount:       float64(amount),
+		Amount:       amount,
 		Type:         transactionType,
-		Date:         time.Now(),
 	}
 
 	if err := database.Conn.Create(&TransactionCryptos).Error; err != nil {
@@ -444,22 +458,44 @@ func TransactionCryptos(c *fiber.Ctx, UserID string, WalletAddres string, price 
 }
 
 func TransactionListCrypto(c *fiber.Ctx) error {
-	issuer, err := helpers.GetIssuerFromContext(c)
+	issuer, err := helpers.GetIssuer(c)
 	if err != nil {
 		return err
 	}
 
-	var TransactionCryptos []model.TransactionCrypto
-	if err := database.Conn.Where("user_id = ?", issuer).Find(&TransactionCryptos).Error; err != nil {
+	var TransactionCrypto []model.TransactionCrypto
+	if err := database.Conn.Where("user_id = ?", issuer).Find(&TransactionCrypto).Error; err != nil {
 		return err
 	}
 
-	return c.JSON(TransactionCryptos)
+	type TransactionResponse struct {
+		UserID       string  `json:"user_id"`
+		WalletAddres string  `json:"wallet_address"`
+		Price        float64 `json:"price"`
+		CryptoName   string  `json:"crypto_name"`
+		Amount       float64 `json:"amount"`
+		Type         string  `json:"type"`
+	}
+
+	var response []TransactionResponse
+
+	for _, transaction := range TransactionCrypto {
+		response = append(response, TransactionResponse{
+			UserID:       issuer,
+			WalletAddres: transaction.WalletAddres,
+			Price:        transaction.Price,
+			CryptoName:   transaction.CryptoName,
+			Amount:       transaction.Amount,
+			Type:         transaction.Type,
+		})
+	}
+
+	return c.JSON(response)
 }
 
 func CryptoWallet(User string, CryptoName string, CryptoPrice float64, Amount float64, ProcessType string) error {
 	var existingCryptoWallet model.CryptoWallet
-	WalletAddress, err := model.GetWalletAddress(database.Conn, User)
+	WalletAddress, err := model.GetWalletAddressByIssuer(database.Conn, User)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return err
@@ -502,17 +538,17 @@ func CryptoWallet(User string, CryptoName string, CryptoPrice float64, Amount fl
 }
 
 func ListCryptoWallet(c *fiber.Ctx) error {
-	issuer, err := helpers.GetIssuerFromContext(c)
+	issuer, err := helpers.GetIssuer(c)
 	if err != nil {
 		return err
 	}
 
-	WalletAddress, err := model.GetWalletAddress(database.Conn, issuer)
+	WalletAddress, err := model.GetWalletAddressByIssuer(database.Conn, issuer)
 	if err != nil {
 		return err
 	}
 
-	cryptoWallets, err := model.GetCryptoWalletsByWalletAddress(database.Conn, issuer)
+	WalletID, err := model.GetCryptoWallet(database.Conn, issuer)
 	if err != nil {
 		return err
 	}
@@ -525,7 +561,7 @@ func ListCryptoWallet(c *fiber.Ctx) error {
 	}
 
 	var response []WalletListResponse
-	for _, cryptoWallet := range cryptoWallets {
+	for _, cryptoWallet := range WalletID {
 		response = append(response, WalletListResponse{
 			WalletAddress:    WalletAddress,
 			CryptoName:       cryptoWallet.CryptoName,
