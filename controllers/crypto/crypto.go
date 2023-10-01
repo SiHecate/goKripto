@@ -14,6 +14,98 @@ import (
 	"gorm.io/gorm"
 )
 
+// Örnek JSON responseler
+type WalletResponse struct {
+	WalletAddress string  `json:"wallet_address"`
+	Username      string  `json:"username"`
+	Balance       float64 `json:"balance"`
+}
+
+// AddAllCryptoData kontrolcüsü için örnek respons
+type AddAllCryptoDataResponse struct {
+	Message string `json:"message"`
+}
+
+// ListAllCryptos kontrolcüsü için örnek respons
+type ListAllCryptoResponse struct {
+	CryptoList []ListAllCrypto `json:"crypto_list"`
+}
+
+type ListAllCrypto struct {
+	CryptoSymbol string  `json:"crypto_symbol"`
+	CryptoName   string  `json:"crypto_name"`
+	CryptoPrice  float64 `json:"crypto_price"`
+}
+
+// AccountBalance kontrolcüsü için örnek respons
+type AccountBalanceResponse struct {
+	WalletAddress string  `json:"wallet_address"`
+	Username      string  `json:"username"`
+	Balance       float64 `json:"balance"`
+}
+
+// AddBalanceCrypto kontrolcüsü için örnek respons
+type AddBalanceResponse struct {
+	Issuer           string  `json:"issuer"`
+	AvailableBalance float64 `json:"available_balance"`
+	TotalBalance     float64 `json:"total_balance"`
+}
+
+// BuyCryptos kontrolcüsü için örnek respons
+type BuyCryptoResponse struct {
+	TotalCost     float64 `json:"total_cost"`
+	CryptoName    string  `json:"crypto_name"`
+	AmountToBuy   float64 `json:"amount_to_buy"`
+	Issuer        string  `json:"issuer"`
+	UserBalance   float64 `json:"user_balance"`
+	UserBalanceAB float64 `json:"user_balance_after_buy"`
+}
+
+// SellCryptos kontrolcüsü için örnek respons
+type SellCryptoResponse struct {
+	TotalProfit      float64 `json:"total_profit"`
+	CryptoName       string  `json:"crypto_name"`
+	AmountToSell     float64 `json:"amount_to_sell"`
+	Issuer           string  `json:"issuer"`
+	UserBalance      float64 `json:"user_balance"`
+	UserBalanceAfter float64 `json:"user_balance_after_sell"`
+}
+
+// TransactionListBalance kontrolcüsü için örnek respons
+type TransactionResponse struct {
+	UserID        string  `json:"user_id"`
+	WalletAddres  string  `json:"wallet_address"`
+	BalanceAmount float64 `json:"price"`
+	Type          string  `json:"type"`
+	TypeInfo      string  `json:"type_info"`
+}
+
+// TransactionListCrypto kontrolcüsü için örnek respons
+type TransactionResponseCrypto struct {
+	UserID       string  `json:"user_id"`
+	WalletAddres string  `json:"wallet_address"`
+	Price        float64 `json:"price"`
+	CryptoName   string  `json:"crypto_name"`
+	Amount       float64 `json:"amount"`
+	Type         string  `json:"type"`
+}
+
+// ListCryptoWallet kontrolcüsü için örnek respons
+type WalletListResponse struct {
+	WalletAddress    string  `json:"wallet_address"`
+	CryptoName       string  `json:"crypto_name"`
+	Amount           float64 `json:"amount"`
+	CryptoTotalPrice float64 `json:"crypto_total_price"`
+}
+
+// AddAllCryptoData
+// @Summary Fetch and Add Crypto Data using WebSocket
+// @Description Fetch cryptocurrency data from an external API and add/update it in the database using WebSocket.
+// @Tags Cryptocurrencies
+// @Security ApiKeyAuth
+// @Success 200 {object} SuccessResponse
+// @Failure 400 {object} ErrorResponse
+// @Router /websocket [get]
 func AddAllCryptoData(ws *websocket.Conn) error {
 	apiURL := "https://api.coincap.io/v2/assets"
 
@@ -95,6 +187,14 @@ func createOrUpdateCrypto(symbol string, name string, price string) error {
 	return nil
 }
 
+// ListAllCryptos
+// @Summary List all cryptocurrencies
+// @Description Get a list of all cryptocurrencies with their symbols, names, and prices.
+// @Tags Cryptocurrencies
+// @Accept json
+// @Produce json
+// @Success 200 {object} []ListAllCryptoResponse
+// @Router /crypto/cryptoList [get]
 func ListAllCryptos(c *fiber.Ctx) error {
 	cryptos, err := model.GetAllCryptos(database.Conn)
 	if err != nil {
@@ -117,6 +217,18 @@ func ListAllCryptos(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
+// AccountBalance
+// @Summary Get User Account Balance
+// @Description Get the account balance of the authenticated user.
+// @Tags User
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} WalletResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /user/balance [get]
 func AccountBalance(c *fiber.Ctx) error {
 	issuer, err := helpers.GetIssuer(c)
 	if err != nil {
@@ -160,6 +272,16 @@ func AccountBalance(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
+// @Summary Add Balance to Crypto Wallet
+// @Description Add a specified amount to the user's cryptocurrency wallet balance.
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param add_balance body float64 true "Amount to add to the balance"
+// @Security ApiKeyAuth
+// @Success 200 {object} AddBalanceResponse
+// @Failure 400 {object} ErrorResponse
+// @Router /user/addBalance [post]
 func AddBalanceCrypto(c *fiber.Ctx) error {
 	issuer, err := helpers.GetIssuer(c)
 	if err != nil {
@@ -209,8 +331,17 @@ func AddBalanceCrypto(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-const SecretKey = "secret"
-
+// @Summary Buy Cryptocurrency
+// @Description Buy a specified amount of cryptocurrency.
+// @Tags Cryptocurrencies
+// @Accept json
+// @Produce json
+// @Param cryptoName body string true "Name of the crypto currency to buy"
+// @Param amountToBuy body float64 true "Amount of crypto currency to buy"
+// @Security ApiKeyAuth
+// @Success 200 {object} BuyCryptoResponse
+// @Failure 400 {object} ErrorResponse
+// @Router /crypto/cryptoBuy [post]
 func BuyCryptos(c *fiber.Ctx) error {
 	issuer, err := helpers.GetIssuer(c)
 	if err != nil {
@@ -305,6 +436,17 @@ func BuyCryptos(c *fiber.Ctx) error {
 	return c.Status(200).JSON(response)
 }
 
+// @Summary Sell Cryptocurrency
+// @Description Sell a specified amount of cryptocurrency.
+// @Tags Cryptocurrencies
+// @Accept json
+// @Produce json
+// @Param cryptoName body string true "Name of the crypto currency to sell"
+// @Param amountToSell body float64 true "Amount of crypto currency to sell"
+// @Security ApiKeyAuth
+// @Success 200 {object} SellCryptoResponse
+// @Failure 400 {object} ErrorResponse
+// @Router /crypto/cryptoSell [post]
 func SellCryptos(c *fiber.Ctx) error {
 	issuer, err := helpers.GetIssuer(c)
 	if err != nil {
@@ -404,6 +546,16 @@ func TransactionBalance(c *fiber.Ctx, UserID string, WalletAddress string, Balan
 	})
 }
 
+// TransactionListBalance
+// @Summary List Balance Transactions
+// @Description Get a list of balance transactions
+// @Tags Transactions
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {array} TransactionResponse
+// @Failure 400 {object} ErrorResponse
+// @Router /transaction/balanceTransaction [get]
 func TransactionListBalance(c *fiber.Ctx) error {
 	issuer, err := helpers.GetIssuer(c)
 	if err != nil {
@@ -457,6 +609,16 @@ func TransactionCryptos(c *fiber.Ctx, UserID string, WalletAddres string, price 
 	})
 }
 
+// TransactionListCrypto
+// @Summary List Crypto Transactions
+// @Description Get a list of cryptocurrency transactions
+// @Tags Transactions
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {array} TransactionResponse
+// @Failure 400 {object} ErrorResponse
+// @Router /transaction/cryptoTransaction [get]
 func TransactionListCrypto(c *fiber.Ctx) error {
 	issuer, err := helpers.GetIssuer(c)
 	if err != nil {
@@ -537,6 +699,16 @@ func CryptoWallet(User string, CryptoName string, CryptoPrice float64, Amount fl
 	return nil
 }
 
+// ListCryptoWallet
+// @Summary List Crypto Wallet
+// @Description Get a list of cryptocurrencies in a user's wallet.
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {array} WalletListResponse
+// @Failure 400 {object} ErrorResponse
+// @Router /user/cryptoWallet [get]
 func ListCryptoWallet(c *fiber.Ctx) error {
 	issuer, err := helpers.GetIssuer(c)
 	if err != nil {

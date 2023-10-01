@@ -15,9 +15,8 @@ func Setup(app *fiber.App) {
 const SecretKey = "secret"
 
 func InitializeRouter(app *fiber.App) {
-	// Middleware for the 'user' group
 	user := app.Group("/user")
-	user.Use(middlewares.JWTMiddleware()) // Add your JWT middleware here
+	user.Use(middlewares.JWTMiddleware())
 	user.Post("/register", AuthController.Register)
 	user.Post("/login", AuthController.Login)
 	user.Post("/logout", AuthController.Logout)
@@ -26,14 +25,12 @@ func InitializeRouter(app *fiber.App) {
 	user.Get("/cryptoWallet", CryptoControllers.ListCryptoWallet)
 	user.Get("/balance", CryptoControllers.AccountBalance)
 
-	// Middleware for the 'crypto' group
 	crypto := app.Group("/crypto")
-	crypto.Use(middlewares.JWTMiddleware()) // Add other middleware as needed
+	crypto.Use(middlewares.JWTMiddleware())
 	crypto.Post("/cryptoBuy", CryptoControllers.BuyCryptos)
 	crypto.Post("/cryptoSell", CryptoControllers.SellCryptos)
 	crypto.Get("/cryptoList", CryptoControllers.ListAllCryptos)
 
-	// Middleware for the 'transaction' group
 	transaction := app.Group("/transaction")
 	transaction.Use(middlewares.JWTMiddleware()) // Add other middleware as needed
 	transaction.Get("/cryptoTransaction", CryptoControllers.TransactionListCrypto)

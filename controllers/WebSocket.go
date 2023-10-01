@@ -10,15 +10,15 @@ import (
 )
 
 func StartWebSocket(app *fiber.App) {
-	app.Use("/ws", func(c *fiber.Ctx) error {
+	app.Use("/websocket", func(c *fiber.Ctx) error {
 		if websocket.IsWebSocketUpgrade(c) {
 			return c.Next()
 		}
 		return fiber.ErrUpgradeRequired
 	})
 
-	app.Get("/ws/:id", websocket.New(func(ws *websocket.Conn) {
-		log.Printf("WebSocket port open on: %s", ws.Params("id"))
+	app.Get("/websocket", websocket.New(func(ws *websocket.Conn) {
+		log.Println("WebSocket port open")
 		// Yenileme hızı
 		ticker := time.NewTicker(5 * time.Second)
 		defer ticker.Stop()
@@ -28,7 +28,7 @@ func StartWebSocket(app *fiber.App) {
 			controllers.AddAllCryptoData(ws.Conn)
 		}
 
-		log.Printf("WebSocket port off!: %s", ws.Params("id"))
+		log.Println("WebSocket port off")
 	}))
 
 	app.Listen(":3000")
