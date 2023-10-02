@@ -22,3 +22,9 @@ https://github.com/yakuter/go-clean-code
 unit testing guide
 
 https://medium.com/trendyol-tech/golang-blazing-fast-unit-tests-fiber-fasthttp-http-internals-and-optimizing-http-server-tests-bbd1fe7b944b
+
+
+export PATH=$(go env GOPATH)/bin:$PATH
+
+
+https://www.youtube.com/watch?v=Y8zvTVPh0Mc&t=363s

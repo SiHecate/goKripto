@@ -16,25 +16,18 @@ import (
 
 const SecretKey = "secret"
 
-// Define a struct for the Register response
 type RegisterResponse struct {
-	// Add fields as needed
 	Message string `json:"message"`
 }
 
-// Define a struct for the Login response
 type LoginResponse struct {
-	// Add fields as needed
 	Message string `json:"message"`
 }
 
-// Define a struct for the success response (used in Logout)
 type SuccessResponse struct {
-	// Add fields as needed
 	Message string `json:"message"`
 }
 
-// Define a struct for the User response (used in User)
 type UserResponse struct {
 	Name          string  `json:"name"`
 	Email         string  `json:"email"`
@@ -42,18 +35,26 @@ type UserResponse struct {
 	WalletBalance float64 `json:"wallet_balance"`
 }
 
-type ErrorResponse struct {
-	Message string `json:"message"`
-	// Add other fields if needed
+type Status400Response struct {
+	Message string `json:"StatusBadRequest"`
 }
 
+type Status401Response struct {
+	Message string `json:"StatusUnauthorized"`
+}
+
+type Status404Response struct {
+	Message string `json:"StatusNotFound"`
+}
+
+// Register
 // @Summary Register user
 // @Description Register func for new user
-// @Tags user
+// @Tags User
 // @Accept json
 // @Produce json
 // @Param name body string true "user name for register example: Umutcan "
-// @Param email body string true "email address for register example: Umutcan@example.com "
+// @Param email body string true "email address for register example"
 // @Param password body string true "password for register example: umutcan123 or umutcan number not required "
 // @Param confrim_pasword body string true "confirm password for register example: umutcan123 or umutcan"
 // @Success 200 {object} RegisterResponse
@@ -105,16 +106,17 @@ func Register(c *fiber.Ctx) error {
 	return c.JSON(user)
 }
 
+// Login
 // @Summary Authenticate and log in a user
 // @Description Authenticates a user by email and password and generates a JWT token.
-// @Tags user
+// @Tags User
 // @Accept json
 // @Produce json
 // @Param  email body string true "user email for log in example: Umutcan@example.com"
 // @Param  password body string ture "password for log in example: umutcan123 or umutcan number not required "
 // @Success 200 {object} LoginResponse
-// @Failure 400 {object} ErrorResponse
-// @Failure 401 {object} ErrorResponse
+// @Failure 400 {object} Status400Response
+// @Failure 401 {object} Status401Response
 // @Router /user/login [post]
 func Login(c *fiber.Ctx) error {
 	var data struct {
@@ -170,9 +172,10 @@ func Login(c *fiber.Ctx) error {
 	})
 }
 
+// Logout
 // @Summary Log out the user
 // @Description Logs out the authenticated user by clearing the JWT token cookie.
-// @Tags user
+// @Tags User
 // @Produce json
 // @Success 200 {object} SuccessResponse
 // @Router /user/logout [post]
@@ -191,12 +194,13 @@ func Logout(c *fiber.Ctx) error {
 	})
 }
 
+// User
 // @Summary Get user information
 // @Description Get the user's information including name, email, wallet address, and wallet balance.
 // @Tags User
 // @Produce json
 // @Success 200 {object} UserResponse
-// @Failure 404 {object} ErrorResponse
+// @Failure 404 {object} Status404Response
 // @Router /user/user [get]
 func User(c *fiber.Ctx) error {
 	issuer, err := helpers.GetIssuer(c)

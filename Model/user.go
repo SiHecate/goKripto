@@ -11,4 +11,5 @@ type User struct {
 	Email    string `json:"email" validate:"required"`
 	Password []byte `json:"-"`
 	Wallet   Wallet `json:"wallet" gorm:"foreignKey:UserID"`
+	Deneme   bool   `json:"boolean"`
 }

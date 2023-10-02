@@ -66,7 +66,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/gokripto_controllers_crypto.Status400Response"
                         }
                     }
                 }
@@ -146,7 +146,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/gokripto_controllers_crypto.Status400Response"
                         }
                     }
                 }
@@ -183,7 +183,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/gokripto_controllers_crypto.Status400Response"
                         }
                     }
                 }
@@ -220,7 +220,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/gokripto_controllers_crypto.Status400Response"
                         }
                     }
                 }
@@ -241,7 +241,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "user"
+                    "User"
                 ],
                 "summary": "Add Balance to Crypto Wallet",
                 "parameters": [
@@ -265,7 +265,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/gokripto_controllers_crypto.Status400Response"
                         }
                     }
                 }
@@ -299,19 +299,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/gokripto_controllers_crypto.Status400Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/controllers.Status401Reponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/gokripto_controllers_crypto.Status404Response"
                         }
                     }
                 }
@@ -332,7 +332,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "user"
+                    "User"
                 ],
                 "summary": "List Crypto Wallet",
                 "responses": {
@@ -348,7 +348,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/gokripto_controllers_crypto.Status400Response"
                         }
                     }
                 }
@@ -364,7 +364,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "user"
+                    "User"
                 ],
                 "summary": "Authenticate and log in a user",
                 "parameters": [
@@ -396,13 +396,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/gokripto_controllers_auth.Status400Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/controllers.Status401Response"
                         }
                     }
                 }
@@ -415,7 +415,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "user"
+                    "User"
                 ],
                 "summary": "Log out the user",
                 "responses": {
@@ -448,7 +448,7 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/gokripto_controllers_auth.Status404Response"
                         }
                     }
                 }
@@ -476,7 +476,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
+                            "$ref": "#/definitions/gokripto_controllers_crypto.Status400Response"
                         }
                     }
                 }
@@ -521,14 +521,6 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.ErrorResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
         "controllers.ListAllCrypto": {
             "type": "object",
             "properties": {
@@ -558,7 +550,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "message": {
-                    "description": "Add fields as needed",
                     "type": "string"
                 }
             }
@@ -586,11 +577,26 @@ const docTemplate = `{
                 }
             }
         },
+        "controllers.Status401Reponse": {
+            "type": "object",
+            "properties": {
+                "StatusUnauthorized": {
+                    "type": "string"
+                }
+            }
+        },
+        "controllers.Status401Response": {
+            "type": "object",
+            "properties": {
+                "StatusUnauthorized": {
+                    "type": "string"
+                }
+            }
+        },
         "controllers.SuccessResponse": {
             "type": "object",
             "properties": {
                 "message": {
-                    "description": "Add fields as needed",
                     "type": "string"
                 }
             }
@@ -659,6 +665,38 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "wallet_address": {
+                    "type": "string"
+                }
+            }
+        },
+        "gokripto_controllers_auth.Status400Response": {
+            "type": "object",
+            "properties": {
+                "StatusBadRequest": {
+                    "type": "string"
+                }
+            }
+        },
+        "gokripto_controllers_auth.Status404Response": {
+            "type": "object",
+            "properties": {
+                "StatusNotFound": {
+                    "type": "string"
+                }
+            }
+        },
+        "gokripto_controllers_crypto.Status400Response": {
+            "type": "object",
+            "properties": {
+                "StatusBadRequest": {
+                    "type": "string"
+                }
+            }
+        },
+        "gokripto_controllers_crypto.Status404Response": {
+            "type": "object",
+            "properties": {
+                "StatusNotFound": {
                     "type": "string"
                 }
             }

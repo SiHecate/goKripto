@@ -23,11 +23,6 @@ definitions:
       user_balance_after_buy:
         type: number
     type: object
-  controllers.ErrorResponse:
-    properties:
-      message:
-        type: string
-    type: object
   controllers.ListAllCrypto:
     properties:
       crypto_name:
@@ -47,7 +42,6 @@ definitions:
   controllers.LoginResponse:
     properties:
       message:
-        description: Add fields as needed
         type: string
     type: object
   controllers.SellCryptoResponse:
@@ -65,10 +59,19 @@ definitions:
       user_balance_after_sell:
         type: number
     type: object
+  controllers.Status401Reponse:
+    properties:
+      StatusUnauthorized:
+        type: string
+    type: object
+  controllers.Status401Response:
+    properties:
+      StatusUnauthorized:
+        type: string
+    type: object
   controllers.SuccessResponse:
     properties:
       message:
-        description: Add fields as needed
         type: string
     type: object
   controllers.TransactionResponse:
@@ -115,6 +118,26 @@ definitions:
       wallet_address:
         type: string
     type: object
+  gokripto_controllers_auth.Status400Response:
+    properties:
+      StatusBadRequest:
+        type: string
+    type: object
+  gokripto_controllers_auth.Status404Response:
+    properties:
+      StatusNotFound:
+        type: string
+    type: object
+  gokripto_controllers_crypto.Status400Response:
+    properties:
+      StatusBadRequest:
+        type: string
+    type: object
+  gokripto_controllers_crypto.Status404Response:
+    properties:
+      StatusNotFound:
+        type: string
+    type: object
 host: localhost:3000
 info:
   contact:
@@ -152,7 +175,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/gokripto_controllers_crypto.Status400Response'
       security:
       - ApiKeyAuth: []
       summary: Buy Cryptocurrency
@@ -204,7 +227,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/gokripto_controllers_crypto.Status400Response'
       security:
       - ApiKeyAuth: []
       summary: Sell Cryptocurrency
@@ -227,7 +250,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/gokripto_controllers_crypto.Status400Response'
       security:
       - ApiKeyAuth: []
       summary: List Balance Transactions
@@ -250,7 +273,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/gokripto_controllers_crypto.Status400Response'
       security:
       - ApiKeyAuth: []
       summary: List Crypto Transactions
@@ -278,12 +301,12 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/gokripto_controllers_crypto.Status400Response'
       security:
       - ApiKeyAuth: []
       summary: Add Balance to Crypto Wallet
       tags:
-      - user
+      - User
   /user/balance:
     get:
       consumes:
@@ -299,15 +322,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/gokripto_controllers_crypto.Status400Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/controllers.Status401Reponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/gokripto_controllers_crypto.Status404Response'
       security:
       - ApiKeyAuth: []
       summary: Get User Account Balance
@@ -330,12 +353,12 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/gokripto_controllers_crypto.Status400Response'
       security:
       - ApiKeyAuth: []
       summary: List Crypto Wallet
       tags:
-      - user
+      - User
   /user/login:
     post:
       consumes:
@@ -365,14 +388,14 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/gokripto_controllers_auth.Status400Response'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/controllers.Status401Response'
       summary: Authenticate and log in a user
       tags:
-      - user
+      - User
   /user/logout:
     post:
       description: Logs out the authenticated user by clearing the JWT token cookie.
@@ -385,7 +408,7 @@ paths:
             $ref: '#/definitions/controllers.SuccessResponse'
       summary: Log out the user
       tags:
-      - user
+      - User
   /user/user:
     get:
       description: Get the user's information including name, email, wallet address,
@@ -400,7 +423,7 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/gokripto_controllers_auth.Status404Response'
       summary: Get user information
       tags:
       - User
@@ -416,7 +439,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
+            $ref: '#/definitions/gokripto_controllers_crypto.Status400Response'
       security:
       - ApiKeyAuth: []
       summary: Fetch and Add Crypto Data using WebSocket
