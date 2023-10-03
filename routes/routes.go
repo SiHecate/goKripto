@@ -15,10 +15,12 @@ func Setup(app *fiber.App) {
 const SecretKey = "secret"
 
 func InitializeRouter(app *fiber.App) {
+	auth := app.Group("/auth")
+	auth.Use("/register", AuthController.Register)
+	auth.Use("/login", AuthController.Login)
+
 	user := app.Group("/user")
 	user.Use(middlewares.JWTMiddleware())
-	user.Post("/register", AuthController.Register)
-	user.Post("/login", AuthController.Login)
 	user.Post("/logout", AuthController.Logout)
 	user.Post("/addBalance", CryptoControllers.AddBalanceCrypto)
 	user.Get("/user", AuthController.User)

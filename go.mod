@@ -54,6 +54,7 @@ require (
 )
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/fasthttp/websocket v1.5.4
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
 )

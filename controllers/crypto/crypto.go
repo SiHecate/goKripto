@@ -313,6 +313,8 @@ func AddBalanceCrypto(c *fiber.Ctx) error {
 
 	addBalance := data.AddBalance
 
+	fmt.Println(addBalance)
+
 	walletAddress, err := model.GetWalletAddressByIssuer(database.Conn, issuer)
 	if err != nil {
 		return err

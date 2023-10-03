@@ -1,6 +1,8 @@
 package model
 
 import (
+	"fmt"
+
 	"gorm.io/gorm"
 )
 
@@ -35,7 +37,7 @@ func GetWalletAddressByIssuer(db *gorm.DB, issuer string) (string, error) {
 	var wallet Wallet
 
 	if err := db.Where("user_id = ?", issuer).First(&wallet).Error; err != nil {
-		return "", err
+		return "", fmt.Errorf("Wallet not found for issuer %s", issuer)
 	}
 
 	WalletAddress := wallet.WalletAddress
