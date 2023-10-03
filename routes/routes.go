@@ -5,21 +5,19 @@ import (
 	CryptoControllers "gokripto/controllers/crypto"
 	"gokripto/middlewares"
 
-	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/gofiber/fiber/v2"
 )
 
 func Setup(app *fiber.App) {
 	InitializeRouter(app)
-	InitializePrometheus(app)
 }
 
 const SecretKey = "secret"
 
 func InitializeRouter(app *fiber.App) {
 	auth := app.Group("/auth")
-	auth.Use("/register", AuthController.Register)
-	auth.Use("/login", AuthController.Login)
+	auth.Post("/register", AuthController.Register)
+	auth.Post("/login", AuthController.Login)
 
 	user := app.Group("/user")
 	user.Use(middlewares.JWTMiddleware())
@@ -36,18 +34,8 @@ func InitializeRouter(app *fiber.App) {
 	crypto.Get("/cryptoList", CryptoControllers.ListAllCryptos)
 
 	transaction := app.Group("/transaction")
-	transaction.Use(middlewares.JWTMiddleware()) // Add other middleware as needed
+	transaction.Use(middlewares.JWTMiddleware())
 	transaction.Get("/cryptoTransaction", CryptoControllers.TransactionListCrypto)
 	transaction.Get("/balanceTransaction", CryptoControllers.TransactionListBalance)
-}
 
-func InitializePrometheus(app *fiber.App) {
-	prometheus := fiberprometheus.New("my-service-name")
-	prometheus.RegisterAt(app, "/metrics")
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello World")
-	})
-	app.Post("/some", func(c *fiber.Ctx) error {
-		return c.SendString("Welcome!")
-	})
 }

@@ -15,14 +15,14 @@ services:
 
   go-app:
     build:
-      dockerfile: Dockerfile
       context: ./
+      dockerfile: Dockerfile
     container_name: Kripto-app
     depends_on:
       - postgres
     ports:
       - "3000:3000"
-    command: air ./main.go -b 0.0.0.0 
+    command: air ./main.go -b 0.0.0.0
     volumes:
       - ./:/app
 
