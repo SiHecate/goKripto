@@ -30,4 +30,4 @@ export PATH=$(go env GOPATH)/bin:$PATH
 https://www.youtube.com/watch?v=Y8zvTVPh0Mc&t=363s
 
 
-https://antonputra.com/monitoring/monitor-golang-with-prometheus/#create-minimal-app
+https://antonputra.com/monitoring/monitor-golang-with-prometheus/#create-minimal-app deneme
