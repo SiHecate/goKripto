@@ -23,11 +23,12 @@ import (
 func main() {
 	database.Connect()
 	app := fiber.New()
+
 	app.Use(cors.New(cors.Config{
 		AllowCredentials: true,
 	}))
 
-	app.Get("/swagger/*", fiberSwagger.HandlerDefault) // route'a taşınacak
+	app.Get("/swagger/*", fiberSwagger.HandlerDefault)
 
 	routes.Setup(app)
 
