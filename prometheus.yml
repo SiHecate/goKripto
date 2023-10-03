@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 15s # Metrikleri kaç saniyede bir toplayacak?
+
+scrape_configs:
+  - job_name: 'go-app' # Bu scrape konfigürasyonu için bir iş ismi belirleyin.
+    static_configs:
+      - targets: ['go-app:3000'] # Go uygulamanızın adresi ve portu

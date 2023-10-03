@@ -5,11 +5,13 @@ import (
 	CryptoControllers "gokripto/controllers/crypto"
 	"gokripto/middlewares"
 
+	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/gofiber/fiber/v2"
 )
 
 func Setup(app *fiber.App) {
 	InitializeRouter(app)
+	InitializePrometheus(app)
 }
 
 const SecretKey = "secret"
@@ -37,4 +39,15 @@ func InitializeRouter(app *fiber.App) {
 	transaction.Use(middlewares.JWTMiddleware()) // Add other middleware as needed
 	transaction.Get("/cryptoTransaction", CryptoControllers.TransactionListCrypto)
 	transaction.Get("/balanceTransaction", CryptoControllers.TransactionListBalance)
+}
+
+func InitializePrometheus(app *fiber.App) {
+	prometheus := fiberprometheus.New("my-service-name")
+	prometheus.RegisterAt(app, "/metrics")
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("Hello World")
+	})
+	app.Post("/some", func(c *fiber.Ctx) error {
+		return c.SendString("Welcome!")
+	})
 }

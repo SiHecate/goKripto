@@ -16,12 +16,9 @@ import (
 // @title           Go Crypto
 // @version         1.0
 // @description     Crypto currency app.
-
 // @contact.name   API Support
 // @contact.url    https://github.com/SiHecate
-
 // @host      localhost:3000
-
 // @securityDefinitions.basic  BasicAuth
 func main() {
 	database.Connect()
@@ -30,7 +27,7 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	app.Get("/swagger/*", fiberSwagger.HandlerDefault)
+	app.Get("/swagger/*", fiberSwagger.HandlerDefault) // route'a taşınacak
 
 	routes.Setup(app)
 
@@ -42,5 +39,6 @@ func main() {
 		wg.Done()
 	}()
 	wg.Wait()
+
 	app.Listen(":3000")
 }
