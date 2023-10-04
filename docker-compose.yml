@@ -1,6 +1,20 @@
 version: '3.8'
 
 services:
+  go-app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: Kripto-app
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    command: air ./main.go -b 0.0.0.0
+    volumes:
+      - ./:/app
+
+
   postgres:
     image: postgres:latest
     container_name: Kripto-Postgres
@@ -13,18 +27,24 @@ services:
     volumes:
       - postgres-db:/var/lib/postgresql/data
 
-  go-app:
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    container_name: Kripto-app
-    depends_on:
-      - postgres
+
+  prometheus:
+    image: prom/prometheus:v2.40.4
     ports:
-      - "3000:3000"
-    command: air ./main.go -b 0.0.0.0
+      - 9090:9090
     volumes:
-      - ./:/app
+      - ./:/goKripto/prometheus.yml
+
+
+  grafana:
+    image: grafana/grafana
+    ports:  
+      - 3000:3000
+    volumes:
+      - ./:/goKripto/datasources.yml
+
+
 
 volumes:
+  grafana:
   postgres-db:

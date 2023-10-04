@@ -9,7 +9,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:3000",
+    "host": "localhost:8080",
     "paths": {
         "/crypto/cryptoBuy": {
             "post": {

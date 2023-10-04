@@ -31,5 +31,5 @@ func StartWebSocket(app *fiber.App) {
 		log.Println("WebSocket port off")
 	}))
 
-	app.Listen(":3000")
+	app.Listen(":8080")
 }

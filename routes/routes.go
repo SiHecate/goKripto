@@ -6,6 +6,7 @@ import (
 	"gokripto/middlewares"
 
 	"github.com/gofiber/fiber/v2"
+	fiberSwagger "github.com/gofiber/swagger"
 )
 
 func Setup(app *fiber.App) {
@@ -15,6 +16,8 @@ func Setup(app *fiber.App) {
 const SecretKey = "secret"
 
 func InitializeRouter(app *fiber.App) {
+	app.Get("/swagger/*", fiberSwagger.HandlerDefault)
+
 	auth := app.Group("/auth")
 	auth.Post("/register", AuthController.Register)
 	auth.Post("/login", AuthController.Login)

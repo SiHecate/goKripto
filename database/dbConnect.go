@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	model "gokripto/Model"
 
 	"gorm.io/driver/postgres"
@@ -23,7 +22,6 @@ func DBConnection() {
 	if err != nil {
 		panic("Database error: " + err.Error())
 	}
-	fmt.Println(Conn)
 }
 
 func MigrateTables() {

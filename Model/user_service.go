@@ -26,6 +26,7 @@ func GetUserByIssuer(db *gorm.DB, issuer string) (*User, error) {
 }
 
 func GetUserByEmail(db *gorm.DB, email string) (*User, error) {
+	fmt.Printf("%+v\n", db)
 	var user User
 	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
 		return nil, err

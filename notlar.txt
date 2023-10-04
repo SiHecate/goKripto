@@ -29,5 +29,5 @@ export PATH=$(go env GOPATH)/bin:$PATH
 
 https://www.youtube.com/watch?v=Y8zvTVPh0Mc&t=363s
 
-asd
-https://antonputra.com/monitoring/monitor-golang-with-prometheus/#create-minimal-app deneme
+
+https://antonputra.com/monitoring/monitor-golang-with-prometheus/#create-minimal-app

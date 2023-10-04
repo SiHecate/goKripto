@@ -28,7 +28,6 @@ require (
 )
 
 require (
-	github.com/ansrivas/fiberprometheus/v2 v2.6.1
 	github.com/gofiber/contrib/websocket v1.2.1
 	github.com/gofiber/swagger v0.1.13
 	github.com/golang-jwt/jwt v3.2.2+incompatible
@@ -47,9 +46,7 @@ require (
 	github.com/go-openapi/spec v0.20.9 // indirect
 	github.com/go-openapi/swag v0.22.4 // indirect
 	github.com/gofiber/adaptor/v2 v2.2.1 // indirect
-	github.com/gofiber/utils v0.0.10 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/gorilla/schema v1.1.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
@@ -67,7 +64,7 @@ require (
 )
 
 require (
+	github.com/ansrivas/fiberprometheus/v2 v2.6.1
 	github.com/fasthttp/websocket v1.5.4
-	github.com/gofiber/fiber v1.14.6
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
 )
