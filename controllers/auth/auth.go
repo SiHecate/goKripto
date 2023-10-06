@@ -66,7 +66,7 @@ func Register(c *fiber.Ctx) error {
 		Name            string `json:"name"`
 		Email           string `json:"email"`
 		Password        string `json:"password"`
-		ConfirmPassword string `json:"confirmPassword"` // Update the field name to match the struct definition
+		ConfirmPassword string `json:"confirmPassword"`
 	}
 
 	if err := c.BodyParser(&data); err != nil {
@@ -144,10 +144,10 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	// JWT oluşturma işlemi
-	expiresAt := jwt.NewNumericDate(time.Now().Add(time.Hour * 2)).Time.Unix()
+	expiresAt := jwt.NewNumericDate(time.Now().Add(time.Hour * 12)).Time.Unix()
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer:    strconv.Itoa(int(user.ID)),
+		Issuer:    strconv.Itoa(int(user.ID)), // Return user.id for issuer
 		ExpiresAt: expiresAt,
 	})
 
@@ -161,7 +161,7 @@ func Login(c *fiber.Ctx) error {
 	cookie := fiber.Cookie{
 		Name:     "jwt",
 		Value:    token,
-		Expires:  time.Now().Add(time.Hour * 2),
+		Expires:  time.Now().Add(time.Hour * 12),
 		HTTPOnly: true,
 	}
 

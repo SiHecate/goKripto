@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"sync"
 
-	httpmiddleware "gokripto/prom"
+	httpmiddleware "gokripto/prometheus"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -30,7 +30,7 @@ func main() {
 	database.Connect()
 	app := fiber.New()
 
-	app.Use(cors.New(cors.Config{ // Cross-Origin Resource Sharing
+	app.Use(cors.New(cors.Config{ // Cookie
 		AllowCredentials: true,
 	}))
 
@@ -47,7 +47,6 @@ func main() {
 
 	app.Listen(":8080")
 
-	// Create non-global registry.
 	registry := prometheus.NewRegistry()
 
 	// Add go runtime metrics and process collectors.
@@ -56,7 +55,6 @@ func main() {
 		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
 	)
 
-	// Expose /metrics HTTP endpoint using the created custom registry.
 	http.Handle(
 		"/metrics",
 		httpmiddleware.New(
