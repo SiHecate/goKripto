@@ -1,20 +1,13 @@
 package main
 
 import (
-	websocket "gokripto/controllers"
 	"gokripto/database"
-	routes "gokripto/routes"
-	"log"
-	"net/http"
+	router "gokripto/router"
+	websocket "gokripto/router"
 	"sync"
-
-	httpmiddleware "gokripto/prometheus"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/collectors"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	_ "gokripto/docs"
 )
@@ -30,11 +23,11 @@ func main() {
 	database.Connect()
 	app := fiber.New()
 
-	app.Use(cors.New(cors.Config{ // Cookie
+	app.Use(cors.New(cors.Config{
 		AllowCredentials: true,
 	}))
 
-	routes.Setup(app)
+	router.Setup(app)
 
 	wg := sync.WaitGroup{}
 	wg.Add(1)
@@ -46,26 +39,5 @@ func main() {
 	wg.Wait()
 
 	app.Listen(":8080")
-
-	registry := prometheus.NewRegistry()
-
-	// Add go runtime metrics and process collectors.
-	registry.MustRegister(
-		collectors.NewGoCollector(),
-		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
-	)
-
-	http.Handle(
-		"/metrics",
-		httpmiddleware.New(
-			registry, nil).
-			WrapHandler("/metrics", promhttp.HandlerFor(
-				registry,
-				promhttp.HandlerOpts{}),
-			))
-
-	log.Fatalln(http.ListenAndServe(":9090", nil))
-
-	select {}
 
 }

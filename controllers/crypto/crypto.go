@@ -366,29 +366,20 @@ func BuyCryptos(c *fiber.Ctx) error {
 		return err
 	}
 
-	var data map[string]interface{}
+	var data struct {
+		CryptoName  string  `json:"cryptoName"`
+		AmountToBuy float64 `json:"amountToBuy"`
+	}
+
 	if err := c.BodyParser(&data); err != nil {
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
-			"message": "Invalid request data",
+			"message": "Geçersiz istek verisi",
 		})
 	}
 
-	cryptoName, ok := data["cryptoName"].(string)
-	if !ok {
-		c.Status(fiber.StatusBadRequest)
-		return c.JSON(fiber.Map{
-			"message": "Invalid cryptoName field",
-		})
-	}
-
-	amountToBuy, ok := data["amountToBuy"].(float64)
-	if !ok {
-		c.Status(fiber.StatusBadRequest)
-		return c.JSON(fiber.Map{
-			"message": "Invalid amountToBuy field",
-		})
-	}
+	cryptoName := data.CryptoName
+	amountToBuy := data.AmountToBuy
 
 	var cryptoPrice float64
 	if err := database.Conn.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice).Error; err != nil {
@@ -406,7 +397,7 @@ func BuyCryptos(c *fiber.Ctx) error {
 	if totalCost > userBalance {
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
-			"message": "Insufficient balance",
+			"message": "Yetersiz bakiye",
 			"balance": userBalance,
 			"cost":    totalCost,
 		})
@@ -430,8 +421,8 @@ func BuyCryptos(c *fiber.Ctx) error {
 	}
 
 	CryptoWallet(issuer, cryptoName, cryptoPrice, amountToBuy, "buy")
-	TransactionBalance(c, issuer, WalletAddress, totalCost, "Purchase", "Crypto Purchase")
-	TransactionCryptos(c, issuer, WalletAddress, cryptoPrice, cryptoName, amountToBuy, "Buy")
+	TransactionBalance(c, issuer, WalletAddress, totalCost, "Satın Alma", "Kripto Satın Alma")
+	TransactionCryptos(c, issuer, WalletAddress, cryptoPrice, cryptoName, amountToBuy, "Satın Alma")
 
 	type BuyCryptoResponse struct {
 		TotalCost     float64 `json:"total_cost"`
@@ -451,7 +442,7 @@ func BuyCryptos(c *fiber.Ctx) error {
 		UserBalanceAB: totalBalance,
 	}
 
-	return c.Status(200).JSON(response)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
 
 // SellCryptos
@@ -472,28 +463,20 @@ func SellCryptos(c *fiber.Ctx) error {
 		return err
 	}
 
-	var data map[string]interface{}
+	var data struct {
+		CryptoName   string  `json:"cryptoName"`
+		AmountToSell float64 `json:"amountToSell"`
+	}
+
 	if err := c.BodyParser(&data); err != nil {
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
-			"message": "Invalid request data",
+			"message": "Geçersiz istek verisi",
 		})
 	}
 
-	cryptoName, ok := data["cryptoName"].(string)
-	if !ok {
-		c.Status(fiber.StatusBadRequest)
-		return c.JSON(fiber.Map{
-			"message": "Invalid cryptoName field",
-		})
-	}
-	amountToSell, ok := data["amountToSell"].(float64)
-	if !ok {
-		c.Status(fiber.StatusBadGateway)
-		return c.JSON(fiber.Map{
-			"message": "Invalid cryptoAmount",
-		})
-	}
+	cryptoName := data.CryptoName
+	amountToSell := data.AmountToSell
 
 	var userBalance float64
 	if err := database.Conn.Model(&model.Wallet{}).Where("id = ?", issuer).Pluck("balance", &userBalance).Error; err != nil {
@@ -501,7 +484,9 @@ func SellCryptos(c *fiber.Ctx) error {
 	}
 
 	var cryptoPrice float64
-	database.Conn.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice)
+	if err := database.Conn.Model(&model.Crypto{}).Where("name = ?", cryptoName).Pluck("price", &cryptoPrice).Error; err != nil {
+		return err
+	}
 
 	totalProfit := cryptoPrice * amountToSell
 	totalBalance := userBalance + totalProfit
@@ -544,7 +529,7 @@ func SellCryptos(c *fiber.Ctx) error {
 		UserBalanceAfter: totalBalance,
 	}
 
-	return c.Status(200).JSON(response)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
 
 func TransactionBalance(c *fiber.Ctx, UserID string, WalletAddress string, BalanceAmount float64, transactionType string, transactionInfo string) error {
