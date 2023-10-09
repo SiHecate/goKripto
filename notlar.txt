@@ -31,3 +31,7 @@ https://www.youtube.com/watch?v=Y8zvTVPh0Mc&t=363s
 
 
 https://antonputra.com/monitoring/monitor-golang-with-prometheus/#create-minimal-app
+
+
+
+https://alperenhasanselcuk.medium.com/log-monitoring-with-grafana-loki-efd1eb9b1f87#:~:text=loglama%20için%20son%20zamanlarda%20adını%20sıkça%20duyduğum%20bir%20tool%20olan,ELK%20stack%20e%20çok%20benziyor.
