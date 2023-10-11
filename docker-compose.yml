@@ -3,6 +3,13 @@
     mynetwork:
       driver: bridge
 
+  x-logging: &logging
+    logging:
+      driver: loki
+      mode: non-blocking
+      options:
+        loki-url: "http://host.docker.internal:3100/loki/api/v1/push"
+
   services:
     go-app:
       networks:
@@ -57,18 +64,19 @@
       networks:
         - mynetwork
       image: grafana/loki:2.9.0
+      container_name: Loki
       volumes:
         - /home/umut/goKripto/config/loki/loki-config.yml:/etc/loki/local-config.yml   
       ports:
         - "3100:3100"
-      restart: unless-stopped
       command: -config.file=/etc/loki/local-config.yml 
 
 
     promtail:
       networks:
         - mynetwork
-      image: grafana/promtail:2.4.0
+      image: grafana/promtail:2.9.0
+      container_name: Promtail
       volumes:
         - /var/log:/var/log
         - /var/lib/docker/containers:/var/lib/docker/containers
