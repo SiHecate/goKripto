@@ -1,8 +1,14 @@
   version: '3.8'
-
   networks:
     mynetwork:
       driver: bridge
+
+  x-logging: &logging
+    logging:
+      driver: loki
+      mode: non-blocking
+      options:
+        loki-url: "http://host.docker.internal:3100/loki/api/v1/push"
 
   services:
     go-app:
@@ -51,40 +57,33 @@
       container_name: Grafana
       ports:  
         - 3000:3000
-      environment:
-        - GF_AUTH_ANONYMOUS_ENABLED=true
-        - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-        - GF_AUTH_DISABLE_LOGIN_FORM=true
       volumes:
         - ./:/goKripto/datasources.yml
 
     loki:
       networks:
         - mynetwork
-      image: grafana/loki:2.4.0
+      image: grafana/loki:2.9.0
+      container_name: Loki
       volumes:
         - /home/umut/goKripto/config/loki/loki-config.yml:/etc/loki/local-config.yml   
       ports:
         - "3100:3100"
-      restart: unless-stopped
       command: -config.file=/etc/loki/local-config.yml 
 
 
     promtail:
       networks:
         - mynetwork
-      image: grafana/promtail:2.4.0
+      image: grafana/promtail:2.9.0
+      container_name: Promtail
       volumes:
         - /var/log:/var/log
-        - /var/run/docker.sock:/var/run/docker.sock
-        - /var/lib/docker/containers:/var/lib/docker/containers:ro
+        - /var/lib/docker/containers:/var/lib/docker/containers
         - /home/umut/goKripto/config/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml   
       restart: unless-stopped
       command: -config.file=/etc/promtail/promtail-config.yml
-      depends_on:
-      - loki
-
-
+  
   volumes:
     grafana:
     postgres-db:
