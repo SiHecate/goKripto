@@ -6,11 +6,11 @@ import (
 	websocket "gokripto/router"
 	"sync"
 
+	_ "gokripto/docs"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-
-	_ "gokripto/docs"
 )
 
 // @title           Go Crypto
