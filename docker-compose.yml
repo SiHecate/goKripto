@@ -51,6 +51,10 @@
       container_name: Grafana
       ports:  
         - 3000:3000
+      environment:
+        - GF_AUTH_ANONYMOUS_ENABLED=true
+        - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+        - GF_AUTH_DISABLE_LOGIN_FORM=true
       volumes:
         - ./:/goKripto/datasources.yml
 
@@ -72,10 +76,13 @@
       image: grafana/promtail:2.4.0
       volumes:
         - /var/log:/var/log
-        - /var/lib/docker/containers:/var/lib/docker/containers
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /var/lib/docker/containers:/var/lib/docker/containers:ro
         - /home/umut/goKripto/config/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml   
       restart: unless-stopped
       command: -config.file=/etc/promtail/promtail-config.yml
+      depends_on:
+      - loki
 
 
   volumes:
