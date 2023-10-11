@@ -23,7 +23,11 @@ import (
 func main() {
 	database.Connect()
 	app := fiber.New()
-	app.Use(logger.New())
+
+	app.Use(logger.New(logger.Config{
+		Format:     "${time} ${status} - ${method} ${path}\n${body}\n",
+		TimeFormat: "02-Jan-2006 15:04:05",
+	}))
 
 	app.Use(cors.New(cors.Config{
 		AllowCredentials: true,
