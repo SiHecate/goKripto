@@ -42,6 +42,19 @@ https://medium.com/@ronnansouza/setting-up-a-kafka-broker-using-docker-creating-
 https://medium.com/swlh/apache-kafka-with-golang-227f9f2eb818
 
 
-Yapılacaklar listesi:
-	Microservice için örnek
-	
+docker-engine code for loki plugin: 
+
+{
+  "builder": {
+    "gc": {
+      "defaultKeepStorage": "20GB",
+      "enabled": true
+    }
+  },
+  "debug": true,
+  "experimental": false,
+  "log-driver": "loki",
+  "log-opts": {
+    "loki-url": "http://host.docker.internal:3100/loki/api/v1/push"
+  }
+}
