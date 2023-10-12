@@ -1,6 +1,8 @@
 
 # Golang Kripto Currency App
 
+https://levelup.gitconnected.com/running-kafka-on-docker-container-1a15b8d0b77c
+
 ## Ports
 * Kripto-app 8080:8080
 * PostgreSQL 5435:5432

@@ -11,6 +11,37 @@
         loki-url: "http://host.docker.internal:3100/loki/api/v1/push"
 
   services:
+
+    notifier:
+      networks:
+        - mynetwork
+      build:
+        context: ./Notifier
+      ports:
+        - "8082:8082"
+      volumes:
+        - ./Notifier:/app
+
+    zookeeper:
+      networks:
+        - mynetwork
+      image: bitnami/zookeeper:latest
+      container_name: zookeeper
+      ports:
+        - "2181:2181"
+
+    kafka:
+      networks:
+        - mynetwork
+      image: wurstmeister/kafka:latest
+      container_name: kafka
+      ports:
+        - "9092:9092"
+      environment:
+        KAFKA_BROKER_ID: 1
+        KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+        KAFKA_ADVERTISED_HOST_NAME: kafka
+
     go-app:
       networks:
         - mynetwork
@@ -22,7 +53,7 @@
         - postgres
       ports:
         - "8080:8080"
-      command: air ./main.go -b 0.0.0.0
+      command: air ./main.go
       volumes:
         - ./:/app
 
@@ -60,29 +91,32 @@
       volumes:
         - ./:/goKripto/datasources.yml
 
-    loki:
-      networks:
-        - mynetwork
-      image: grafana/loki:2.9.0
-      container_name: Loki
-      volumes:
-        - /home/umut/goKripto/config/loki/loki-config.yml:/etc/loki/local-config.yml   
-      ports:
-        - "3100:3100"
-      command: -config.file=/etc/loki/local-config.yml 
+    # Kafka testleri yapılasıya kadar devre dışı bırakıldı
+    # docker compose'da container'ı downlamaya çalışıldığında yaklaşık olarak 6 dakika bekletiyor
+    # bundan dolayı kapalı
 
+    # loki:
+    #   networks:
+    #     - mynetwork
+    #   image: grafana/loki:2.9.0
+    #   container_name: Loki
+    #   volumes:
+    #     - /home/umut/goKripto/config/loki/loki-config.yml:/etc/loki/local-config.yml   
+    #   ports:
+    #     - "3100:3100"
+    #   command: -config.file=/etc/loki/local-config.yml 
 
-    promtail:
-      networks:
-        - mynetwork
-      image: grafana/promtail:2.9.0
-      container_name: Promtail
-      volumes:
-        - /var/log:/var/log
-        - /var/lib/docker/containers:/var/lib/docker/containers
-        - /home/umut/goKripto/config/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml   
-      restart: unless-stopped
-      command: -config.file=/etc/promtail/promtail-config.yml
+    # promtail:
+    #   networks:
+    #     - mynetwork
+    #   image: grafana/promtail:2.9.0
+    #   container_name: Promtail
+    #   volumes:
+    #     - /var/log:/var/log
+    #     - /var/lib/docker/containers:/var/lib/docker/containers
+    #     - /home/umut/goKripto/config/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml   
+    #   restart: unless-stopped
+    #   command: -config.file=/etc/promtail/promtail-config.yml
   
   volumes:
     grafana:

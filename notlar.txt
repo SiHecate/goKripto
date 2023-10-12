@@ -58,3 +58,9 @@ docker-engine code for loki plugin:
     "loki-url": "http://host.docker.internal:3100/loki/api/v1/push"
   }
 }
+
+
+
+
+
+https://github.com/confluentinc/confluent-kafka-go
