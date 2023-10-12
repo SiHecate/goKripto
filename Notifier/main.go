@@ -63,13 +63,10 @@ func PushCommentToQueue(topic string, message []byte) error {
 	return nil
 }
 
-// createComment handler
 func createComment(c *fiber.Ctx) error {
 
-	// Instantiate new Message struct
 	cmt := new(Comment)
 
-	//  Parse body into comment struct
 	if err := c.BodyParser(cmt); err != nil {
 		log.Println(err)
 		c.Status(400).JSON(&fiber.Map{
@@ -78,11 +75,9 @@ func createComment(c *fiber.Ctx) error {
 		})
 		return err
 	}
-	// convert body into bytes and send it to kafka
 	cmtInBytes, err := json.Marshal(cmt)
 	PushCommentToQueue("comments", cmtInBytes)
 
-	// Return Comment in JSON format
 	err = c.JSON(&fiber.Map{
 		"success": true,
 		"message": "Comment pushed successfully",
