@@ -1,95 +1,44 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
 
-	"github.com/IBM/sarama"
+	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
-// Comment struct
-type Comment struct {
-	Text string `form:"text" json:"text"`
-}
-
 func main() {
-
 	app := fiber.New()
-	api := app.Group("/api/v1")
-	api.Post("/comments", createComment)
-	app.Listen(":8082")
 
-}
+	app.Use(logger.New(logger.Config{
+		Format:     "${time} ${status} - ${method} ${path}\n${body}\n",
+		TimeFormat: "02-Jan-2006 15:04:05",
+	}))
 
-func ConnectProducer(brokersUrl []string) (sarama.SyncProducer, error) {
+	app.Post("/send-message", func(c *fiber.Ctx) error {
+		data := c.FormValue("message")
+		p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "kafka"})
+		if err != nil {
+			log.Printf("Producer creation error: %v\n", err)
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Producer creation error",
+			})
+		}
+		defer p.Close()
 
-	config := sarama.NewConfig()
-	config.Producer.Return.Successes = true
-	config.Producer.RequiredAcks = sarama.WaitForAll
-	config.Producer.Retry.Max = 5
+		topic := "myTopic"
+		p.Produce(&kafka.Message{
+			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+			Value:          []byte(data),
+		}, nil)
 
-	conn, err := sarama.NewSyncProducer(brokersUrl, config)
-	if err != nil {
-		return nil, err
-	}
+		p.Flush(15 * 1000)
 
-	return conn, nil
-}
-
-func PushCommentToQueue(topic string, message []byte) error {
-
-	brokersUrl := []string{"kafka:9092"}
-	producer, err := ConnectProducer(brokersUrl)
-	if err != nil {
-		return err
-	}
-
-	defer producer.Close()
-
-	msg := &sarama.ProducerMessage{
-		Topic: topic,
-		Value: sarama.StringEncoder(message),
-	}
-
-	partition, offset, err := producer.SendMessage(msg)
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("Message is stored in topic(%s)/partition(%d)/offset(%d)\n", topic, partition, offset)
-
-	return nil
-}
-
-func createComment(c *fiber.Ctx) error {
-
-	cmt := new(Comment)
-
-	if err := c.BodyParser(cmt); err != nil {
-		log.Println(err)
-		c.Status(400).JSON(&fiber.Map{
-			"success": false,
-			"message": err,
+		return c.JSON(fiber.Map{
+			"message": "Veri Kafka'ya gönderildi",
 		})
-		return err
-	}
-	cmtInBytes, err := json.Marshal(cmt)
-	PushCommentToQueue("comments", cmtInBytes)
-
-	err = c.JSON(&fiber.Map{
-		"success": true,
-		"message": "Comment pushed successfully",
-		"comment": cmt,
 	})
-	if err != nil {
-		c.Status(500).JSON(&fiber.Map{
-			"success": false,
-			"message": "Error creating product",
-		})
-		return err
-	}
 
-	return err
+	log.Fatal(app.Listen(":8082"))
 }

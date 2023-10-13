@@ -5,14 +5,12 @@ import (
 	router "cryptoApp/router"
 	websocket "cryptoApp/router"
 	"fmt"
-	"os"
-	"os/signal"
 	"sync"
-	"syscall"
+	"time"
 
 	_ "cryptoApp/docs"
 
-	"github.com/IBM/sarama"
+	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -29,9 +27,9 @@ func main() {
 	database.Connect()
 	app := fiber.New()
 
-	// go func() {
-	// 	consumer()
-	// }()
+	go func() {
+		ConsumeMessages()
+	}()
 
 	app.Use(logger.New(logger.Config{
 		Format:     "${time} ${status} - ${method} ${path}\n${body}\n",
@@ -56,61 +54,33 @@ func main() {
 	app.Listen(":8080")
 }
 
-func consumer() {
-	topic := "comments"
-	worker, err := connectConsumer([]string{"kafka:9092"})
+func ConsumeMessages() {
+	c, err := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers": "kafka",
+		"group.id":          "myGroup",
+		"auto.offset.reset": "earliest",
+	})
+
 	if err != nil {
 		panic(err)
 	}
 
-	consumer, err := worker.ConsumePartition(topic, 0, sarama.OffsetNewest)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Consumer started ")
+	c.SubscribeTopics([]string{"myTopic", "^aRegex.*[Tt]opic"}, nil)
 
-	sigchan := make(chan os.Signal, 1)
-	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
+	// A signal handler or similar could be used to set this to false to break the loop.
+	run := true
 
-	msgCount := 0
-	doneCh := make(chan struct{})
-
-	go func() {
-		for {
-			select {
-			case err := <-consumer.Errors():
-				fmt.Println(err)
-			case msg := <-consumer.Messages():
-				msgCount++
-				fmt.Printf("Received message Count %d: | Topic(%s) | Message(%s) \n", msgCount, string(msg.Topic), string(msg.Value))
-			case <-sigchan:
-				fmt.Println("Interrupt is detected")
-				close(doneCh)
-				return
-			}
+	for run {
+		msg, err := c.ReadMessage(time.Second)
+		if err == nil {
+			fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
+		} else if !err.(kafka.Error).IsTimeout() {
+			// The client will automatically try to recover from all errors.
+			// Timeout is not considered an error because it is raised by
+			// ReadMessage in absence of messages.
+			fmt.Printf("Consumer error: %v (%v)\n", err, msg)
 		}
-	}()
-
-	<-doneCh
-	fmt.Println("Processed", msgCount, "messages")
-
-	if err := worker.Close(); err != nil {
-		panic(err)
-	}
-}
-
-func connectConsumer(brokersUrl []string) (sarama.Consumer, error) {
-	config := sarama.NewConfig()
-	config.Consumer.Return.Errors = true
-
-	conn, err := sarama.NewConsumer(brokersUrl, config)
-	if err != nil {
-		return nil, err
 	}
 
-	return conn, nil
-}
-
-func DenemeApp(something string) {
-	fmt.Println(something)
+	c.Close()
 }

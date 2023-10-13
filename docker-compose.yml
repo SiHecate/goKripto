@@ -27,23 +27,23 @@
     zookeeper:
       networks:
         - mynetwork
-      image: bitnami/zookeeper:latest
-      container_name: zookeeper
+      image: wurstmeister/zookeeper
+      container_name: Zookeeper
       ports:
         - "2181:2181"
 
     kafka:
       networks:
         - mynetwork
-      image: wurstmeister/kafka:latest
+      image: wurstmeister/kafka
       container_name: kafka
       ports:
         - "9092:9092"
       environment:
-        KAFKA_BROKER_ID: 1
-        KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
         KAFKA_ADVERTISED_HOST_NAME: kafka
+        KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
+        
     go-app:
       networks:
         - mynetwork
