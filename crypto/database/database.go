@@ -1,7 +1,7 @@
 package database
 
 import (
-	model "gokripto/Model"
+	model "cryptoApp/Model"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

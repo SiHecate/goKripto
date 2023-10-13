@@ -1,8 +1,8 @@
 package helpers
 
 import (
+	model "cryptoApp/Model"
 	"errors"
-	model "gokripto/Model"
 	"math/rand"
 	"time"
 

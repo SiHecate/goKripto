@@ -1,9 +1,9 @@
 package router
 
 import (
-	AuthController "gokripto/controllers/auth"
-	CryptoControllers "gokripto/controllers/crypto"
-	"gokripto/middlewares"
+	AuthController "cryptoApp/controllers/auth"
+	CryptoControllers "cryptoApp/controllers/crypto"
+	"cryptoApp/middlewares"
 
 	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/gofiber/fiber/v2"

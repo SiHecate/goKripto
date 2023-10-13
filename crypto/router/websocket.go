@@ -1,7 +1,7 @@
 package router
 
 import (
-	controllers "gokripto/controllers/crypto"
+	controllers "cryptoApp/controllers/crypto"
 	"log"
 	"time"
 

@@ -1,11 +1,10 @@
 package controllers
 
 import (
-	model "gokripto/Model"
-	"gokripto/database"
-	"gokripto/helpers"
-	helper "gokripto/helpers"
-	"gokripto/repositories"
+	model "cryptoApp/Model"
+	"cryptoApp/database"
+	helper "cryptoApp/helpers"
+	"cryptoApp/repositories"
 	"strconv"
 	"time"
 
@@ -203,7 +202,7 @@ func Logout(c *fiber.Ctx) error {
 // @Failure 404 {object} Status404Response
 // @Router /user/user [get]
 func User(c *fiber.Ctx) error {
-	issuer, err := helpers.GetIssuer(c)
+	issuer, err := helper.GetIssuer(c)
 	if err != nil {
 		return err
 	}

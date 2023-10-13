@@ -16,11 +16,13 @@
       networks:
         - mynetwork
       build:
-        context: ./Notifier
+        context: ./notifier
+        dockerfile: Dockerfile
+      container_name: Notifier
       ports:
         - "8082:8082"
       volumes:
-        - ./Notifier:/app
+        - ./notifier:/app
 
     zookeeper:
       networks:
@@ -46,16 +48,16 @@
       networks:
         - mynetwork
       build:
-        context: ./
+        context: ./crypto
         dockerfile: Dockerfile
       container_name: Kripto-app
       depends_on:
         - postgres
       ports:
         - "8080:8080"
-      command: air ./main.go
+      command: air ./crypto/main.go
       volumes:
-        - ./:/app
+        - ./crypto:/app
 
     postgres:
       networks:
@@ -101,7 +103,7 @@
     #   image: grafana/loki:2.9.0
     #   container_name: Loki
     #   volumes:
-    #     - /home/umut/goKripto/config/loki/loki-config.yml:/etc/loki/local-config.yml   
+    #     - /home/umut/goKripto/loki-config.yml:/etc/loki/local-config.yml   
     #   ports:
     #     - "3100:3100"
     #   command: -config.file=/etc/loki/local-config.yml 
@@ -114,7 +116,7 @@
     #   volumes:
     #     - /var/log:/var/log
     #     - /var/lib/docker/containers:/var/lib/docker/containers
-    #     - /home/umut/goKripto/config/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml   
+    #     - /home/umut/goKripto/promtail-config.yml:/etc/promtail/promtail-config.yml   
     #   restart: unless-stopped
     #   command: -config.file=/etc/promtail/promtail-config.yml
   

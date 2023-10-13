@@ -1,16 +1,16 @@
 package main
 
 import (
+	"cryptoApp/database"
+	router "cryptoApp/router"
+	websocket "cryptoApp/router"
 	"fmt"
-	"gokripto/database"
-	router "gokripto/router"
-	websocket "gokripto/router"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 
-	_ "gokripto/docs"
+	_ "cryptoApp/docs"
 
 	"github.com/IBM/sarama"
 	"github.com/gofiber/fiber/v2"
@@ -18,7 +18,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
-// @title           Go Crypto
+// @title           Go Cryptos
 // @version         1.0
 // @description     Crypto currency app.
 // @contact.name   API Support
@@ -29,9 +29,9 @@ func main() {
 	database.Connect()
 	app := fiber.New()
 
-	go func() {
-		consumer()
-	}()
+	// go func() {
+	// 	consumer()
+	// }()
 
 	app.Use(logger.New(logger.Config{
 		Format:     "${time} ${status} - ${method} ${path}\n${body}\n",
@@ -109,4 +109,8 @@ func connectConsumer(brokersUrl []string) (sarama.Consumer, error) {
 	}
 
 	return conn, nil
+}
+
+func DenemeApp(something string) {
+	fmt.Println(something)
 }

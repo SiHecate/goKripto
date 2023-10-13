@@ -3,13 +3,16 @@ module Notifier
 go 1.20
 
 require (
-	github.com/IBM/sarama v1.41.2 // indirect
+	github.com/IBM/sarama v1.41.2
+	github.com/gofiber/fiber/v2 v2.49.2
+)
+
+require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/eapache/go-resiliency v1.4.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
-	github.com/gofiber/fiber/v2 v2.49.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.3.1 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect

@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	model "gokripto/Model"
-	"gokripto/database"
+	model "cryptoApp/Model"
+	"cryptoApp/database"
 
 	"gorm.io/gorm"
 )

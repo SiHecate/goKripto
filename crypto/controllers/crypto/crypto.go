@@ -1,11 +1,11 @@
 package controllers
 
 import (
+	model "cryptoApp/Model"
+	"cryptoApp/database"
+	helpers "cryptoApp/helpers"
 	"encoding/json"
 	"fmt"
-	model "gokripto/Model"
-	"gokripto/database"
-	helpers "gokripto/helpers"
 	"net/http"
 	"strconv"
 

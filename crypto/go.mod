@@ -1,4 +1,4 @@
-module gokripto
+module cryptoApp
 
 go 1.20
 
@@ -7,7 +7,7 @@ require github.com/gofiber/fiber/v2 v2.49.2 // direct
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/google/uuid v1.3.1 // indirect
-	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgpassfile v1.0.0 // indirect; indirect"
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgx/v5 v5.4.3 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
