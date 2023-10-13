@@ -1,0 +1,451 @@
+definitions:
+  controllers.AddBalanceResponse:
+    properties:
+      available_balance:
+        type: number
+      issuer:
+        type: string
+      total_balance:
+        type: number
+    type: object
+  controllers.BuyCryptoResponse:
+    properties:
+      amount_to_buy:
+        type: number
+      crypto_name:
+        type: string
+      issuer:
+        type: string
+      total_cost:
+        type: number
+      user_balance:
+        type: number
+      user_balance_after_buy:
+        type: number
+    type: object
+  controllers.ListAllCrypto:
+    properties:
+      crypto_name:
+        type: string
+      crypto_price:
+        type: number
+      crypto_symbol:
+        type: string
+    type: object
+  controllers.ListAllCryptoResponse:
+    properties:
+      crypto_list:
+        items:
+          $ref: '#/definitions/controllers.ListAllCrypto'
+        type: array
+    type: object
+  controllers.LoginResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  controllers.SellCryptoResponse:
+    properties:
+      amount_to_sell:
+        type: number
+      crypto_name:
+        type: string
+      issuer:
+        type: string
+      total_profit:
+        type: number
+      user_balance:
+        type: number
+      user_balance_after_sell:
+        type: number
+    type: object
+  controllers.Status401Reponse:
+    properties:
+      StatusUnauthorized:
+        type: string
+    type: object
+  controllers.Status401Response:
+    properties:
+      StatusUnauthorized:
+        type: string
+    type: object
+  controllers.SuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  controllers.TransactionResponse:
+    properties:
+      price:
+        type: number
+      type:
+        type: string
+      type_info:
+        type: string
+      user_id:
+        type: string
+      wallet_address:
+        type: string
+    type: object
+  controllers.UserResponse:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      wallet_address:
+        type: string
+      wallet_balance:
+        type: number
+    type: object
+  controllers.WalletListResponse:
+    properties:
+      amount:
+        type: number
+      crypto_name:
+        type: string
+      crypto_total_price:
+        type: number
+      wallet_address:
+        type: string
+    type: object
+  controllers.WalletResponse:
+    properties:
+      balance:
+        type: number
+      username:
+        type: string
+      wallet_address:
+        type: string
+    type: object
+  gokripto_controllers_auth.Status400Response:
+    properties:
+      StatusBadRequest:
+        type: string
+    type: object
+  gokripto_controllers_auth.Status404Response:
+    properties:
+      StatusNotFound:
+        type: string
+    type: object
+  gokripto_controllers_crypto.Status400Response:
+    properties:
+      StatusBadRequest:
+        type: string
+    type: object
+  gokripto_controllers_crypto.Status404Response:
+    properties:
+      StatusNotFound:
+        type: string
+    type: object
+host: localhost:3000
+info:
+  contact:
+    name: API Support
+    url: https://github.com/SiHecate
+  description: Crypto currency app.
+  title: Go Crypto
+  version: "1.0"
+paths:
+  /crypto/cryptoBuy:
+    post:
+      consumes:
+      - application/json
+      description: Buy a specified amount of cryptocurrency.
+      parameters:
+      - description: Name of the crypto currency to buy
+        in: body
+        name: cryptoName
+        required: true
+        schema:
+          type: string
+      - description: Amount of crypto currency to buy
+        in: body
+        name: amountToBuy
+        required: true
+        schema:
+          type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.BuyCryptoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gokripto_controllers_crypto.Status400Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Buy Cryptocurrency
+      tags:
+      - Cryptocurrencies
+  /crypto/cryptoList:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all cryptocurrencies with their symbols, names, and
+        prices.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controllers.ListAllCryptoResponse'
+            type: array
+      summary: List all cryptocurrencies
+      tags:
+      - Cryptocurrencies
+  /crypto/cryptoSell:
+    post:
+      consumes:
+      - application/json
+      description: Sell a specified amount of cryptocurrency.
+      parameters:
+      - description: Name of the crypto currency to sell
+        in: body
+        name: cryptoName
+        required: true
+        schema:
+          type: string
+      - description: Amount of crypto currency to sell
+        in: body
+        name: amountToSell
+        required: true
+        schema:
+          type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SellCryptoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gokripto_controllers_crypto.Status400Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Sell Cryptocurrency
+      tags:
+      - Cryptocurrencies
+  /transaction/balanceTransaction:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of balance transactions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controllers.TransactionResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gokripto_controllers_crypto.Status400Response'
+      security:
+      - ApiKeyAuth: []
+      summary: List Balance Transactions
+      tags:
+      - Transactions
+  /transaction/cryptoTransaction:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of cryptocurrency transactions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controllers.TransactionResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gokripto_controllers_crypto.Status400Response'
+      security:
+      - ApiKeyAuth: []
+      summary: List Crypto Transactions
+      tags:
+      - Transactions
+  /user/addBalance:
+    post:
+      consumes:
+      - application/json
+      description: Add a specified amount to the user's cryptocurrency wallet balance.
+      parameters:
+      - description: Amount to add to the balance
+        in: body
+        name: add_balance
+        required: true
+        schema:
+          type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.AddBalanceResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gokripto_controllers_crypto.Status400Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Add Balance to Crypto Wallet
+      tags:
+      - User
+  /user/balance:
+    get:
+      consumes:
+      - application/json
+      description: Get the account balance of the authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.WalletResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gokripto_controllers_crypto.Status400Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.Status401Reponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gokripto_controllers_crypto.Status404Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get User Account Balance
+      tags:
+      - User
+  /user/cryptoWallet:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of cryptocurrencies in a user's wallet.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controllers.WalletListResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gokripto_controllers_crypto.Status400Response'
+      security:
+      - ApiKeyAuth: []
+      summary: List Crypto Wallet
+      tags:
+      - User
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user by email and password and generates a JWT
+        token.
+      parameters:
+      - description: 'user email for log in example: Umutcan@example.com'
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      - description: 'password for log in example: umutcan123 or umutcan number not
+          required '
+        in: body
+        name: password
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gokripto_controllers_auth.Status400Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.Status401Response'
+      summary: Authenticate and log in a user
+      tags:
+      - User
+  /user/logout:
+    post:
+      description: Logs out the authenticated user by clearing the JWT token cookie.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      summary: Log out the user
+      tags:
+      - User
+  /user/user:
+    get:
+      description: Get the user's information including name, email, wallet address,
+        and wallet balance.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.UserResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/gokripto_controllers_auth.Status404Response'
+      summary: Get user information
+      tags:
+      - User
+  /websocket:
+    get:
+      description: Fetch cryptocurrency data from an external API and add/update it
+        in the database using WebSocket.
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gokripto_controllers_crypto.Status400Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Fetch and Add Crypto Data using WebSocket
+      tags:
+      - Cryptocurrencies
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
