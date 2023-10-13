@@ -1,9 +1,8 @@
 package verification
 
 import (
-	model "/home/umut/goKripto/crypto/Model"
-	"/home/umut/goKripto/crypto/database"
-	helper "/home/umut/goKripto/crypto/helpers"
+	model "cryptoApp/Model"
+	"cryptoApp/database"
 
 	"github.com/gofiber/fiber/v2"
 )
