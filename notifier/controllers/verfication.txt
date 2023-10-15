@@ -3,11 +3,11 @@ package verification
 import (
 	model "cryptoApp/Model"
 	"cryptoApp/database"
+	helper "cryptoApp/helpers"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-// Diğer kodlar buraya gelir...
 
 func Verfication(c *fiber.Ctx) error {
 	issuer, err := helper.GetIssuer(c)

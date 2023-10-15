@@ -1,14 +1,11 @@
 package main
 
 import (
-	router "Notifier/router"
 	"log"
 	"math/rand"
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func GenerateCode() string {
@@ -23,36 +20,23 @@ func GenerateCode() string {
 }
 
 func main() {
-	app := fiber.New()
-	router.Setup(app)
-	app.Use(logger.New(logger.Config{
-		Format:     "${time} ${status} - ${method} ${path}\n${body}\n",
-		TimeFormat: "02-Jan-2006 15:04:05",
-	}))
+	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "kafka"})
+	if err != nil {
+		log.Printf("Producer creation error: %v\n", err)
+		return
+	}
+	defer p.Close()
 
-	app.Post("/send-message", func(c *fiber.Ctx) error {
-		data := c.FormValue("message")
-		p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "kafka"})
-		if err != nil {
-			log.Printf("Producer creation error: %v\n", err)
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Producer creation error",
-			})
-		}
-		defer p.Close()
+	topic := "myTopic"
 
-		topic := "myTopic"
-		p.Produce(&kafka.Message{
-			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-			Value:          []byte(data),
-		}, nil)
+	// Generate a random code
+	code := GenerateCode()
 
-		p.Flush(15 * 1000)
+	// Send the code to Kafka
+	p.Produce(&kafka.Message{
+		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+		Value:          []byte(code),
+	}, nil)
 
-		return c.JSON(fiber.Map{
-			"message": "Veri Kafka'ya gönderildi",
-		})
-	})
-
-	log.Fatal(app.Listen(":8082"))
+	p.Flush(15 * 1000)
 }

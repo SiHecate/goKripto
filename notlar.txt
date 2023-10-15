@@ -48,3 +48,4 @@ docker-engine code for loki plugin:
 
 
 https://github.com/confluentinc/confluent-kafka-go
+https://stackoverflow.com/questions/60727208/undefined-kafka-components-for-go-kafka
