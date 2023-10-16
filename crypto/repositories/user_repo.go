@@ -3,6 +3,7 @@ package repositories
 import (
 	model "cryptoApp/Model"
 	"cryptoApp/database"
+	"cryptoApp/helpers"
 
 	"gorm.io/gorm"
 )
@@ -41,7 +42,17 @@ func (repo *UserRepository) CreateUser(data struct {
 		Password: passwordBytes,
 	}
 
+	verfication_code := helpers.GenerateCode()
+
+	verfication := model.Verfication{
+		Email:       data.Email,
+		Verfication: verfication_code,
+	}
+
 	if err := repo.db.Create(&user).Error; err != nil {
+		return nil, err
+	}
+	if err := repo.db.Create(&verfication).Error; err != nil {
 		return nil, err
 	}
 

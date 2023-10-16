@@ -32,6 +32,7 @@ func MigrateTables() {
 		&model.Crypto{},
 		&model.TransactionBalance{},
 		&model.TransactionCrypto{},
+		&model.Verfication{},
 	)
 
 }
@@ -44,5 +45,6 @@ func DownTables() {
 		&model.Crypto{},
 		&model.TransactionBalance{},
 		&model.TransactionCrypto{},
+		&model.Verfication{},
 	)
 }

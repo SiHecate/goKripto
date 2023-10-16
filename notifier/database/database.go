@@ -1,8 +1,6 @@
 package database
 
 import (
-	model "Notifier/model"
-
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -11,7 +9,6 @@ var Conn *gorm.DB
 
 func Connect() {
 	DBConnection()
-	MigrateTables()
 }
 
 func DBConnection() {
@@ -22,10 +19,4 @@ func DBConnection() {
 	if err != nil {
 		panic("Database error: " + err.Error())
 	}
-}
-
-func MigrateTables() {
-	Conn.AutoMigrate(
-		&model.Verfication{},
-	)
 }

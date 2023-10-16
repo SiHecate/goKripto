@@ -1,21 +1,16 @@
 package verification
 
 import (
-	model "cryptoApp/Model"
-	"cryptoApp/database"
-	helper "cryptoApp/helpers"
+	"Notifier/database"
+	"Notifier/model"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func Verfication(c *fiber.Ctx) error {
-	issuer, err := helper.GetIssuer(c)
-	if err != nil {
-		return err
-	}
+func Verification(c *fiber.Ctx) error {
 	var data struct {
-		Email       string `json:"email"`
-		Verfication bool   `json:"verfication"`
+		Email        string `json:"email"`
+		Verification bool   `json:"verification"`
 	}
 
 	if err := c.BodyParser(&data); err != nil {
@@ -24,21 +19,26 @@ func Verfication(c *fiber.Ctx) error {
 		})
 	}
 
-	user, err := model.GetUserByIssuer(database.Conn, issuer)
-	if err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"message": "User not found",
+	email := data.Email
+	verificationCode := data.Verification
+
+	// Check verification
+	verificationQuery := database.Conn.Model(&model.Verfication{}).Where("email = ? OR verification = ?", email, verificationCode)
+	if err := verificationQuery.Error; err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "Verification failed",
+			"error":   err.Error(),
 		})
 	}
 
-	type Verfication struct {
-		Name  string
-		Email string
+	// Update 'verification' field
+	userUpdateQuery := database.Conn.Model(&model.User{}).Where("email = ?", email).Update("verification", true)
+	if updateErr := userUpdateQuery.Error; updateErr != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "Error updating verification",
+			"error":   updateErr.Error(),
+		})
 	}
 
-	response := Verfication{
-		Name:  user.Name,
-		Email: user.Email,
-	}
-	return c.JSON(response)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{})
 }
