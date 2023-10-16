@@ -36,7 +36,14 @@ func ConsumeMessages() {
 			} else {
 				// "Mail" ve "Code" alanlarını alın ve yazdırın
 				fmt.Printf("Mail: %s, Code: %s\n", messageData.Mail, messageData.Code)
-				VerificationTable()
+
+				verfication := model.Verfication{
+					Email:       messageData.Mail,
+					Verfication: messageData.Code,
+				}
+
+				database.Conn.Create(&verfication)
+
 			}
 		}
 	}
@@ -47,29 +54,4 @@ func ConsumeMessages() {
 type Message struct {
 	Mail string `json:"mail"`
 	Code string `json:"code"`
-}
-
-func ConvertMessage(message *kafka.Message) *Message {
-	var messageData Message
-	err := json.Unmarshal(message.Value, &messageData)
-	if err != nil {
-		return nil
-	}
-
-	return &messageData
-}
-
-func VerificationTable() error {
-	messageData := Message{}
-
-	verfication := model.Verfication{
-		Email:       messageData.Mail,
-		Verfication: messageData.Code,
-	}
-
-	if err := database.Conn.Create(&verfication).Error; err != nil {
-		return err
-	}
-
-	return nil
 }
