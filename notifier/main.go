@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Notifier/database"
 	"log"
 	"math/rand"
 	"time"
@@ -20,6 +21,7 @@ func GenerateCode() string {
 }
 
 func main() {
+	database.Connect()
 	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "kafka"})
 	if err != nil {
 		log.Printf("Producer creation error: %v\n", err)
