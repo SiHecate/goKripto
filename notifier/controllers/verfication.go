@@ -7,6 +7,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+func VerificationTable()
+
 func Verification(c *fiber.Ctx) error {
 	var data struct {
 		Email        string `json:"email"`
