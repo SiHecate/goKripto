@@ -1,9 +1,9 @@
 package consume
 
 import (
+	"encoding/json"
 	"fmt"
-	"os"
-	"os/signal"
+	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
@@ -19,25 +19,26 @@ func ConsumeMessages() {
 		panic(err)
 	}
 
-	c.SubscribeTopics([]string{"myTopic"}, nil)
-
-	sigchan := make(chan os.Signal, 1)
-	signal.Notify(sigchan, os.Interrupt)
+	c.SubscribeTopics([]string{"myTopic", "^aRegex.*[Tt]opic"}, nil)
 
 	run := true
 
+	type message struct {
+		Mail string `json:"mail"`
+		Code string `json:"code"`
+	}
+
 	for run {
-		select {
-		case sig := <-sigchan:
-			fmt.Printf("Caught signal %v: terminating\n", sig)
-			run = false
-		default:
-			ev := c.Poll(100)
-			switch e := ev.(type) {
-			case *kafka.Message:
-				fmt.Printf("Message on %s: %s\n", e.TopicPartition, string(e.Value))
-			case kafka.Error:
-				fmt.Fprintf(os.Stderr, "Error: %v\n", e)
+		msg, err := c.ReadMessage(time.Second)
+		if err == nil {
+			// Mesajın içeriğini JSON olarak parse edin
+			var messageData message
+			err := json.Unmarshal(msg.Value, &messageData)
+			if err != nil {
+				fmt.Printf("Mesaj JSON çözümlemesi hatası: %v\n", err)
+			} else {
+				// "Mail" ve "Code" alanlarını alın ve yazdırın
+				fmt.Printf("Mail: %s, Code: %s\n", messageData.Mail, messageData.Code)
 			}
 		}
 	}

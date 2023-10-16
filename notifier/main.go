@@ -2,6 +2,7 @@ package main
 
 import (
 	consume "Notifier/Consume"
+	"Notifier/database"
 	router "Notifier/router"
 
 	"github.com/gofiber/fiber/v2"
@@ -9,6 +10,7 @@ import (
 )
 
 func main() {
+	database.Connect()
 	app := fiber.New()
 
 	router.Setup(app)

@@ -146,7 +146,7 @@ func Login(c *fiber.Ctx) error {
 	expiresAt := jwt.NewNumericDate(time.Now().Add(time.Hour * 12)).Time.Unix()
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer:    strconv.Itoa(int(user.ID)), // Return user.id for issuer
+		Issuer:    strconv.Itoa(int(user.ID)),
 		ExpiresAt: expiresAt,
 	})
 

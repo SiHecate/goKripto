@@ -10,5 +10,6 @@ type User struct {
 	Name        string `json:"name" validate:"required"`
 	Email       string `json:"email" validate:"required"`
 	Password    []byte `json:"-"`
+	Wallet      Wallet `json:"wallet" gorm:"foreignKey:UserID"`
 	Verfication bool   `json:"verfication"`
 }

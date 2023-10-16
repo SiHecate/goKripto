@@ -12,4 +12,6 @@ func Setup(app *fiber.App) {
 
 func InitializeRouter(app *fiber.App) {
 	app.Post("/verfication", controller.Verification)
+	app.Get("/verification-table", controller.PrintVerificationTable)
+
 }
