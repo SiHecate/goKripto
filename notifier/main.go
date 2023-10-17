@@ -4,6 +4,7 @@ import (
 	consume "Notifier/Consume"
 	"Notifier/database"
 	"Notifier/logger"
+
 	router "Notifier/router"
 	"time"
 
