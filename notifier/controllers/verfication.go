@@ -36,6 +36,21 @@ func Verification(c *fiber.Ctx) error {
 		})
 	}
 
+	var user model.User
+	if err := database.Conn.Model(&user).Where("email = ?", email).Update("verfication", true).Error; err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "Mail doğrularken database'de bir hata meydana geldi",
+			"error":   err.Error(),
+		})
+	}
+
+	if err := database.Conn.Model(&user).Where("email = ? AND verification = ?", email, true).Error; err != nil {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"message": "Kullanıcı halihazırda onaylı",
+			"error":   err.Error(),
+		})
+	}
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Doğrulama başarılı",
 	})

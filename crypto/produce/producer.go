@@ -41,7 +41,6 @@ func VerficationCode(c *fiber.Ctx) error {
 		return err
 	}
 
-	// Code ve mail değerlerini içeren bir JSON nesnesi oluşturun.
 	message := struct {
 		Code string `json:"code"`
 		Mail string `json:"mail"`
