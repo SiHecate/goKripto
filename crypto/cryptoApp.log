@@ -1,0 +1,2 @@
+{"level":"info","ts":1697545231.6713977,"caller":"app/main.go:53","msg":"HTTP Log","Method":"GET","Path":"/metrics","Status":200,"Latency":0.003315575}
+{"level":"info","ts":1697545246.6676419,"caller":"app/main.go:53","msg":"HTTP Log","Method":"GET","Path":"/metrics","Status":200,"Latency":0.001580767}

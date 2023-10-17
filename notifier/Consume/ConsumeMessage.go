@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"go.uber.org/zap"
 )
 
 func ConsumeMessages() {
@@ -41,6 +42,14 @@ func ConsumeMessages() {
 					Email:       messageData.Mail,
 					Verfication: messageData.Code,
 				}
+
+				logger, _ := zap.NewProduction()
+				defer logger.Sync()
+
+				logger.Info("Kafka producter response",
+					zap.String("Verification code:", messageData.Code),
+					zap.String("Verification mail:", messageData.Mail),
+				)
 
 				database.Conn.Create(&verfication)
 

@@ -3,26 +3,40 @@ package main
 import (
 	consume "Notifier/Consume"
 	"Notifier/database"
+	"Notifier/logger"
 	router "Notifier/router"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
+	"go.uber.org/zap"
 )
 
 func main() {
 	database.Connect()
-	app := fiber.New()
 
+	logger, _ := logger.InitLogger()
+
+	app := fiber.New()
 	router.Setup(app)
 
 	go func() {
 		consume.ConsumeMessages()
 	}()
 
-	app.Use(logger.New(logger.Config{
-		Format:     "${time} ${status} - ${method} ${path}\n${body}\n",
-		TimeFormat: "02-Jan-2006 15:04:05",
-	}))
+	app.Use(func(c *fiber.Ctx) error {
+		startTime := time.Now()
+		c.Next()
+		endTime := time.Now()
+
+		logger.Info("HTTP log",
+			zap.String("Method", c.Method()),
+			zap.String("Path", c.Path()),
+			zap.Int("Status", c.Response().StatusCode()),
+			zap.Duration("Latency", endTime.Sub(startTime)),
+		)
+
+		return nil
+	})
 
 	app.Listen(":8082")
 }
