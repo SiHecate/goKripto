@@ -34,6 +34,28 @@ func GetUserByEmail(db *gorm.DB, email string) (*User, error) {
 	return &user, nil
 }
 
+func GetMailByIssuer(db *gorm.DB, issuer string) (string, error) {
+	var user User
+
+	if err := db.Where("id = ?", issuer).First(&user).Error; err != nil {
+		return "", fmt.Errorf("Email not found for issuer %s", issuer)
+	}
+
+	UserMail := user.Email
+	return UserMail, nil
+}
+
+func GetVerficationByMail(db *gorm.DB, email string) (string, error) {
+	var verfication Verfication
+
+	if err := db.Where("email = ?", email).First(&verfication).Error; err != nil {
+		return "", fmt.Errorf("Verfication code not found for mail %s", email)
+	}
+
+	verfication_code := verfication.Verfication
+	return verfication_code, nil
+}
+
 func GetWalletAddressByIssuer(db *gorm.DB, issuer string) (string, error) {
 	var wallet Wallet
 

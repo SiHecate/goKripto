@@ -26,6 +26,8 @@ func DBConnection() {
 
 func MigrateTables() {
 	Conn.AutoMigrate(
+		&model.User{},
 		&model.Verfication{},
 	)
+
 }

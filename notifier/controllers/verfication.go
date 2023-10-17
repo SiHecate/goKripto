@@ -1,44 +1,55 @@
 package verification
 
 import (
-	model "cryptoApp/Model"
-	"cryptoApp/database"
-	helper "cryptoApp/helpers"
+	"Notifier/database"
+	"Notifier/model"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func Verfication(c *fiber.Ctx) error {
-	issuer, err := helper.GetIssuer(c)
-	if err != nil {
-		return err
-	}
+func Verification(c *fiber.Ctx) error {
 	var data struct {
-		Email       string `json:"email"`
-		Verfication bool   `json:"verfication"`
+		Email        string `json:"email"`
+		Verification string `json:"verification"`
 	}
 
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Invalid request data",
+			"message": "Geçersiz istek verisi",
 		})
 	}
 
-	user, err := model.GetUserByIssuer(database.Conn, issuer)
-	if err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"message": "User not found",
+	email := data.Email
+	verificationCode := data.Verification
+
+	var emailVerification model.Verfication
+	if err := database.Conn.Where("email = ?", email).First(&emailVerification).Error; err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "Mail doğrulaması başarısız",
+			"error":   err.Error(),
 		})
 	}
 
-	type Verfication struct {
-		Name  string
-		Email string
+	if emailVerification.Verfication != verificationCode {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "Kod doğrulaması başarısız",
+		})
 	}
 
-	response := Verfication{
-		Name:  user.Name,
-		Email: user.Email,
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Doğrulama başarılı",
+	})
+}
+
+func PrintVerificationTable(c *fiber.Ctx) error {
+	var verifications []model.Verfication
+
+	if err := database.Conn.Find(&verifications).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Tabloya erişim başarısız",
+			"error":   err.Error(),
+		})
 	}
-	return c.JSON(response)
+
+	return c.Status(fiber.StatusOK).JSON(verifications)
 }

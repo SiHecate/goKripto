@@ -4,6 +4,7 @@ import (
 	AuthController "cryptoApp/controllers/auth"
 	CryptoControllers "cryptoApp/controllers/crypto"
 	"cryptoApp/middlewares"
+	"cryptoApp/produce"
 
 	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/gofiber/fiber/v2"
@@ -26,6 +27,9 @@ func InitializeRouter(app *fiber.App) {
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello World")
 	})
+
+	app.Use(middlewares.JWTMiddleware())
+	app.Get("/verfication_code", produce.VerficationCode)
 
 	// Swagger
 	app.Get("/swagger/*", fiberSwagger.HandlerDefault)
