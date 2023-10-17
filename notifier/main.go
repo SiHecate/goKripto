@@ -17,7 +17,6 @@ func main() {
 	logger, _ := logger.InitLogger()
 
 	app := fiber.New()
-	router.Setup(app)
 
 	go func() {
 		consume.ConsumeMessages()
@@ -37,6 +36,8 @@ func main() {
 
 		return nil
 	})
+
+	router.Setup(app)
 
 	app.Listen(":8082")
 }

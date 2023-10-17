@@ -33,7 +33,6 @@ require (
 	github.com/gofiber/swagger v0.1.14
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-jwt/jwt/v4 v4.5.0
-	github.com/paul-milne/zap-loki v0.2.0
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/swag v1.16.2
 	go.uber.org/zap v1.26.0
@@ -69,5 +68,6 @@ require (
 require (
 	github.com/ansrivas/fiberprometheus/v2 v2.0.0
 	github.com/fasthttp/websocket v1.5.4
+	github.com/paul-milne/zap-loki v0.2.0
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
 )

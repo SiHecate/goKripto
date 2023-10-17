@@ -9,7 +9,7 @@ import (
 )
 
 func InitLogger() (*zap.Logger, error) {
-	zapConfig := zap.NewProductionConfig()
+	zapConfig := zap.NewDevelopmentConfig()
 	loki := zaploki.New(context.Background(), zaploki.Config{
 		Url:          "http://loki:3100",
 		BatchMaxSize: 1000,
