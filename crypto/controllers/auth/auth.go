@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -59,7 +59,6 @@ type Status404Response struct {
 // @Success 200 {object} RegisterResponse
 // @Failure 400 {object} ErrorResponse
 // @Router /user/register [post]
-
 func Register(c *fiber.Ctx) error {
 	var data struct {
 		Name            string `json:"name"`
@@ -142,12 +141,10 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	// JWT oluşturma işlemi
-	expiresAt := jwt.NewNumericDate(time.Now().Add(time.Hour * 12)).Time.Unix()
-
-	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+	now := time.Now()
+	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
 		Issuer:    strconv.Itoa(int(user.ID)),
-		ExpiresAt: expiresAt,
+		ExpiresAt: jwt.NewNumericDate(now.Add(time.Hour * 24)),
 	})
 
 	token, err := claims.SignedString([]byte(SecretKey))
@@ -233,5 +230,6 @@ func User(c *fiber.Ctx) error {
 		WalletAddress: walletAddress,
 		WalletBalance: user.Wallet.Balance,
 	}
+
 	return c.JSON(response)
 }
