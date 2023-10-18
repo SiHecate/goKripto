@@ -32,7 +32,7 @@ require (
 	github.com/gofiber/contrib/websocket v1.2.1
 	github.com/gofiber/swagger v0.1.14
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/swag v1.16.2
 	go.uber.org/zap v1.26.0
@@ -48,7 +48,6 @@ require (
 	github.com/go-openapi/spec v0.20.9 // indirect
 	github.com/go-openapi/swag v0.22.4 // indirect
 	github.com/gofiber/adaptor/v2 v2.2.1 // indirect
-	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect

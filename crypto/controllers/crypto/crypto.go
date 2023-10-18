@@ -426,7 +426,6 @@ func BuyCryptos(c *fiber.Ctx) error {
 		TotalCost     float64 `json:"total_cost"`
 		CryptoName    string  `json:"crypto_name"`
 		AmountToBuy   float64 `json:"amount_to_buy"`
-		Issuer        string  `json:"issuer"`
 		UserBalance   float64 `json:"user_balance"`
 		UserBalanceAB float64 `json:"user_balance_after_buy"`
 	}
@@ -435,7 +434,6 @@ func BuyCryptos(c *fiber.Ctx) error {
 		TotalCost:     totalCost,
 		CryptoName:    cryptoName,
 		AmountToBuy:   amountToBuy,
-		Issuer:        issuer,
 		UserBalance:   userBalance,
 		UserBalanceAB: totalBalance,
 	}
@@ -488,6 +486,7 @@ func SellCryptos(c *fiber.Ctx) error {
 
 	totalProfit := cryptoPrice * amountToSell
 	totalBalance := userBalance + totalProfit
+
 	if err := database.Conn.Model(&model.Wallet{}).Where("user_id = ?", issuer).Update("balance", totalBalance).Error; err != nil {
 		return err
 	}
@@ -513,7 +512,6 @@ func SellCryptos(c *fiber.Ctx) error {
 		TotalProfit      float64 `json:"total_profit"`
 		CryptoName       string  `json:"crypto_name"`
 		AmountToSell     float64 `json:"amount_to_sell"`
-		Issuer           string  `json:"issuer"`
 		UserBalance      float64 `json:"user_balance"`
 		UserBalanceAfter float64 `json:"user_balance_after_sell"`
 	}
@@ -522,7 +520,6 @@ func SellCryptos(c *fiber.Ctx) error {
 		TotalProfit:      totalProfit,
 		CryptoName:       cryptoName,
 		AmountToSell:     amountToSell,
-		Issuer:           issuer,
 		UserBalance:      userBalance,
 		UserBalanceAfter: totalBalance,
 	}
