@@ -11,6 +11,35 @@ x-logging: &logging
       loki-url: "http://host.docker.internal:3100/loki/api/v1/push"
 
 services:
+  go-app:
+    networks:
+      - mynetwork
+    build:
+      context: ./crypto
+      dockerfile: Dockerfile
+    container_name: Kripto-app
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    command: air ./crypto/main.go
+    volumes:
+      - ./crypto:/app
+
+  postgres:
+    networks:
+      - mynetwork
+    image: postgres:15.0
+    container_name: Kripto-Postgres
+    environment:
+      POSTGRES_DB: kriptoDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 393406
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
   notifier:
     networks:
       - mynetwork
@@ -42,39 +71,10 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
-  go-app:
-    networks:
-      - mynetwork
-    build:
-      context: ./crypto
-      dockerfile: Dockerfile
-    container_name: Kripto-app
-    depends_on:
-      - postgres
-    ports:
-      - "8080:8080"
-    command: air ./crypto/main.go
-    volumes:
-      - ./crypto:/app
-
-  postgres:
-    networks:
-      - mynetwork
-    image: postgres:15.0
-    container_name: Kripto-Postgres
-    environment:
-      POSTGRES_DB: kriptoDB
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 393406
-    ports:
-      - "5435:5432"
-    volumes:
-      - postgres-db:/var/lib/postgresql/data
-
   prometheus:
     networks:
       - mynetwork
-    image: prom/prometheus:v2.40.4
+    image: prom/prometheus:latest
     container_name: Prometheus
     ports:
       - 9090:9090
@@ -94,7 +94,7 @@ services:
   loki:
     networks:
       - mynetwork
-    image: grafana/loki:2.9.0
+    image: grafana/loki:latest
     container_name: Loki
     volumes:
       - /home/umut/goKripto/loki-config.yml:/etc/loki/local-config.yml   
@@ -105,7 +105,7 @@ services:
   promtail:
     networks:
       - mynetwork
-    image: grafana/promtail:2.9.0
+    image: grafana/promtail:latest
     container_name: Promtail
     volumes:
       - /var/log:/var/log
