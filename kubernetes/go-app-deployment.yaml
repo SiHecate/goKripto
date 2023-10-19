@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out /home/umut/goKripto/kubernetes
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: go-app
+  name: go-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: go-app
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --out /home/umut/goKripto/kubernetes
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/gokripto-mynetwork: "true"
+        io.kompose.service: go-app
+    spec:
+      containers:
+        - args:
+            - air
+            - ./crypto/main.go
+          image: go-app
+          name: kripto-app
+          ports:
+            - containerPort: 8080
+              hostPort: 8080
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - mountPath: /app
+              name: go-app-claim0
+      restartPolicy: Always
+      volumes:
+        - name: go-app-claim0
+          persistentVolumeClaim:
+            claimName: go-app-claim0
+status: {}
