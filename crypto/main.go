@@ -4,6 +4,7 @@ import (
 	"cryptoApp/database"
 	router "cryptoApp/router"
 	websocket "cryptoApp/router"
+	"log"
 	"sync"
 
 	_ "cryptoApp/docs"
@@ -33,5 +34,5 @@ func main() {
 	}()
 	wg.Wait()
 
-	app.Listen(":8080")
+	log.Fatal(app.Listen(":8080"))
 }

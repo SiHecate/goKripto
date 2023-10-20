@@ -37,9 +37,12 @@ func InitializeRouter(app *fiber.App) {
 	// Swagger
 	app.Get("/swagger/*", fiberSwagger.HandlerDefault)
 
+	// Log middleware
+	logMiddleware := middlewares.Logger()
+
 	// Authentication
 	auth := app.Group("/auth")
-	auth.Use(middlewares.Logger())
+	auth.Use(logMiddleware)
 	auth.Post("/register", AuthController.Register)
 	auth.Post("/login", AuthController.Login)
 
@@ -47,7 +50,7 @@ func InitializeRouter(app *fiber.App) {
 	user := app.Group("/user")
 	user.Use(middlewares.JWTMiddleware())
 	user.Use(middlewares.Validiation())
-	user.Use(middlewares.Logger())
+	user.Use(logMiddleware)
 	user.Post("/logout", AuthController.Logout)
 	user.Post("/addBalance", CryptoControllers.AddBalanceCrypto)
 	user.Get("/user", AuthController.User)
@@ -58,7 +61,7 @@ func InitializeRouter(app *fiber.App) {
 	crypto := app.Group("/crypto")
 	crypto.Use(middlewares.JWTMiddleware())
 	crypto.Use(middlewares.Validiation())
-	crypto.Use(middlewares.Logger())
+	crypto.Use(logMiddleware)
 	crypto.Post("/cryptoBuy", CryptoControllers.BuyCryptos)
 	crypto.Post("/cryptoSell", CryptoControllers.SellCryptos)
 	crypto.Get("/cryptoList", CryptoControllers.ListAllCryptos)
@@ -67,7 +70,7 @@ func InitializeRouter(app *fiber.App) {
 	transaction := app.Group("/transaction")
 	transaction.Use(middlewares.JWTMiddleware())
 	transaction.Use(middlewares.Validiation())
-	transaction.Use(middlewares.Logger())
+	transaction.Use(logMiddleware)
 	transaction.Get("/cryptoTransaction", CryptoControllers.TransactionListCrypto)
 	transaction.Get("/balanceTransaction", CryptoControllers.TransactionListBalance)
 

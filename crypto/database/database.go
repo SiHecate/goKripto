@@ -2,6 +2,7 @@ package database
 
 import (
 	model "cryptoApp/Model"
+	"fmt"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -12,6 +13,8 @@ var Conn *gorm.DB
 func Connect() {
 	DBConnection()
 	MigrateTables()
+
+	fmt.Println("Database connection success!")
 }
 
 func DBConnection() {
