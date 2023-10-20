@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kripto-postgres
+spec:
+  selector:
+    matchLabels:
+      app: kripto-postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kripto-postgres
+    spec:
+      containers:
+        - name: kripto-postgres
+          image: postgres:15.0
+          env:
+            - name: POSTGRES_DB
+              value: kriptoDB
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: 393406
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-db
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-db
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kripto-postgres-service
+spec:
+  selector:
+    app: kripto-postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP
