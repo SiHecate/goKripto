@@ -132,7 +132,6 @@ func AddAllCryptoData(ws *websocket.Conn) error {
 		helpers.SendJSONError(ws, errorMessage)
 		return err
 	}
-	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
 		errorMessage := fiber.Map{
@@ -221,6 +220,7 @@ func ListAllCryptos(c *fiber.Ctx) error {
 	}
 
 	var response []ListAllCrypto
+
 	for _, crypto := range cryptos {
 		response = append(response, ListAllCrypto{
 			Symbol: crypto.Symbol,
@@ -273,12 +273,14 @@ func AccountBalance(c *fiber.Ctx) error {
 
 	type WalletResponse struct {
 		WalletAddress string  `json:"wallet_address"`
+		UserID        string  `json:"user_id"`
 		Username      string  `json:"username"`
 		Balance       float64 `json:"balance"`
 	}
 
 	response := WalletResponse{
 		WalletAddress: walletAddress,
+		UserID:        issuer,
 		Username:      user.Name,
 		Balance:       wallet.Balance,
 	}
@@ -655,6 +657,8 @@ func TransactionListCrypto(c *fiber.Ctx) error {
 }
 
 func CryptoWallet(User string, CryptoName string, CryptoPrice float64, Amount float64, ProcessType string) error {
+
+	// get existing crypto wallet from database table
 	var existingCryptoWallet model.CryptoWallet
 	WalletAddress, err := model.GetWalletAddressByIssuer(database.Conn, User)
 	if err != nil {

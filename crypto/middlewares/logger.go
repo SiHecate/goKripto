@@ -9,6 +9,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// Loki sender
 func InitLogger() (*zap.Logger, error) {
 	zapConfig := zap.NewProductionConfig()
 	loki := zaploki.New(context.Background(), zaploki.Config{
@@ -26,11 +27,14 @@ func Logger() fiber.Handler {
 	defer logger.Sync()
 
 	return func(c *fiber.Ctx) error {
+
+		// latency calculating
 		startTime := time.Now()
 		if err := c.Next(); err != nil {
 			return err
 		}
 		endTime := time.Now()
+		// latency calculating
 
 		logger.Info("HTTP Log",
 			zap.String("Method", c.Method()),

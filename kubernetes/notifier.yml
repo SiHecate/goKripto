@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: notifier
-          image: your-docker-image-name # Bu imaj adını Dockerfile ve Docker Hub gibi kaynaklara göre güncellemeniz gerekebilir.
+          image: your-docker-image-name 
           ports:
             - containerPort: 8082
           volumeMounts:
