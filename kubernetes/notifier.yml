@@ -14,22 +14,28 @@ spec:
     spec:
       containers:
         - name: notifier
-          image: your-docker-image-name 
+          image: blrumutcan/notifier/:firsttry # Notifier'ı docker'a pushla 
           ports:
             - containerPort: 8082
           volumeMounts:
+            - mountPath: /app
             - name: notifier-volume
-              mountPath: /app
+      volumes:
+      - name: notifier-volume
+      hostPath:
+        path: /home/umut/goKripto/notifier
+
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
   name: notifier-service
+  namespace: default
 spec:
+  type: NodePort
   selector:
     app: notifier
   ports:
-    - protocol: TCP
       port: 8082
-      targetPort: 8082
-  type: LoadBalancer # Service türünü uygulamanızın gereksinimlerine göre ayarlayabilirsiniz.
+      targetPort: 8082 

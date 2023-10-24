@@ -20,7 +20,7 @@ spec:
         - containerPort: 8080
         volumeMounts:
         - mountPath: /app
-          name: go-app-volume
+        - name: go-app-volume
       volumes:
       - name: go-app-volume
         hostPath:
